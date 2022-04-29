@@ -4168,7 +4168,7 @@ module.exports = {
         abi: LOSTANDFOUNDCONTRACT3ABI,
       },
       lostandFoundContract4: {
-          address: "0xa4248aC1a4Fc557134802f39cddF830Fde6DdA06",
+          address: "0x60bf8601de15c9fFC689314E7E76C701a1b01645",
           abi: LOSTANDFOUNDCONTRACT4ABI,
       }      
     },
