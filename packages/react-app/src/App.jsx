@@ -1,4 +1,4 @@
-import {  Menu } from "antd";
+import {  Menu, Button } from "antd";
 import "antd/dist/antd.css";
 import {
   useBalance,
@@ -22,11 +22,11 @@ import { NETWORKS, ALCHEMY_KEY } from "./constants";
 import externalContracts from "./contracts/external_contracts";
 import deployedContracts from "./contracts/hardhat_contracts.json";
 import { Transactor, Web3ModalSetup } from "./helpers";
-import { OldEnglish, Mint, About } from "./views";
+import { OldEnglish, Mint, About, Test } from "./views";
 import { useStaticJsonRPC } from "./hooks";
 
 //====MY CUSTOM IMPORTS
-import mainnetZoraAddresses from "@zoralabs/v3/dist/addresses/4.json";
+import mainnetZoraAddresses from "@zoralabs/v3/dist/addresses/3.json";
 import linedPaperBackground from "./Lined_Paper_Background_For_Site.png";
 //====MY CUSTOM IMPORTS
 
@@ -56,7 +56,7 @@ const { ethers } = require("ethers");
 const DEBUG = true;
 const NETWORKCHECK = true;
 
-const targetNetworkString = "rinkeby" // <------ change this as you deploy do other networks
+const targetNetworkString = "ropsten" // <------ change this as you deploy do other networks
 
 const web3Modal = Web3ModalSetup();
 
@@ -71,11 +71,11 @@ function App(props) {
   const oldEnglishContract = "EightPack";
 
   //======my custom additions
-  const zoraTransferHelperContract = "zoraTransferHelper"; //change this in external_contracts.js to convert to rinkeby/mainnet
-  const zmmContract = "zoraModuleManager"; //change this in external_contracts.js to convert to rinkeby/mainnet
-  const zoraAsksContract = "zoraAsksV1_1Module"; //change this in external_contracts.js to convert to rinkeby/mainnet
+  const zoraTransferHelperContract = "zoraTransferHelperROPSTEN"; //change this in external_contracts.js to convert to rinkeby/mainnet
+  const zmmContract = "zoraModuleManagerROPSTEN"; //change this in external_contracts.js to convert to rinkeby/mainnet
+  const zoraAsksContract = "zoraAsksV1_1ModuleROPSTEN"; //change this in external_contracts.js to convert to rinkeby/mainnet
   const lostandfoundNFTContract = "lostandFoundContract4"; // update address of lostandFoundContract2 if redeploying an identical nft contract for testing purposes
-  const lostandfoundNFTContractAddress = "0x60bf8601de15c9fFC689314E7E76C701a1b01645"; // change this to the nft contract you want to be interacting with
+  const lostandfoundNFTContractAddress = "0xd373B9C8acc3439d42359bDAd3a0e3cC4BD0Ff66"; // change this to the nft contract you want to be interacting with
   //======my custom additions
 
   // specify all the chains your app is available on. Eg: ['localhost', 'mainnet', ...otherNetworks ]
@@ -270,6 +270,16 @@ function App(props) {
               </button>
             </Link>
           </Menu.Item>
+          <Menu.Item
+            style={{width: "29%", margin: 0, padding: 0 }}
+            key="/test"
+          >
+            <Link to="/test">
+              <Button>
+                Test
+              </Button>
+            </Link>
+          </Menu.Item>          
         </Menu>
         
         <div className="networkAndAccountWrapper">
@@ -361,7 +371,25 @@ function App(props) {
               oldEnglishContract={oldEnglishContract}
             />
           </div>
-        </Route>               
+        </Route>
+        <Route exact path="/test">
+          <div>
+            <Test
+              readContracts={readContracts}
+              mainnetProvider={mainnetProvider}
+              blockExplorer={blockExplorer}
+              totalSupply={totalSupply}
+              maxSupply={maxSupply}
+              writeContracts={writeContracts}
+              localProvider={localProvider}
+              userSigner={userSigner}
+              tx={tx}
+              address={address}
+              DEBUG={DEBUG}
+              oldEnglishContract={oldEnglishContract}
+            />
+          </div>
+        </Route>                 
       </Switch>
 
 {/* COMMENTING OUT HELPFUL SCAFFOLD-ETH TOOLS NOT USED IN THIS PROJECT

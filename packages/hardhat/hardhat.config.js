@@ -26,7 +26,7 @@ const { isAddress, getAddress, formatUnits, parseUnits } = utils;
 //
 // Select the network you want to deploy to here:
 //
-const defaultNetwork = "rinkeby";
+const defaultNetwork = "ropsten";
 
 const mainnetGwei = 60;
 
@@ -73,10 +73,10 @@ module.exports = {
       */
     },
 
-    rinkeby: {
+/*     rinkeby: {
       url: `https://eth-rinkeby.alchemyapi.io/v2/${process.env.RINKEBY_ALCHEMY_KEY}`,
       accounts: [`${process.env.RINKEBY_DEPLOYER_PRIV_KEY}`],
-    },
+    }, */
     // kovan: {
     //   url: `https://rinkeby.infura.io/v3/${process.env.KOVAN_INFURA_KEY}`,
     //   accounts: [`${process.env.KOVAN_DEPLOYER_PRIV_KEY}`],
@@ -85,10 +85,10 @@ module.exports = {
       url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.MAINNET_ALCHEMY_KEY}`,
       accounts: [`${process.env.MAINNET_DEPLOYER_PRIV_KEY}`],
     }, */
-    // ropsten: {
-    //   url: `https://ropsten.infura.io/v3/${process.env.ROPSTEN_INFURA_KEY}`,
-    //   accounts: [`${process.env.ROPSTEN_DEPLOYER_PRIV_KEY}`],
-    // },
+    ropsten: {
+      url: `https://eth-ropsten.alchemyapi.io/v2/${process.env.RINKEBY_ALCHEMY_KEY}`,
+      accounts: [`${process.env.ROPSTEN_DEPLOYER_PRIV_KEY}`],
+    },
     // goerli: {
     //   url: `https://goerli.infura.io/v3/${process.env.GOERLI_INFURA_KEY}`,
     //   accounts: [`${process.env.GOERLI_DEPLOYER_PRIV_KEY}`],

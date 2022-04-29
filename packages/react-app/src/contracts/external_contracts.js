@@ -4173,4 +4173,25 @@ module.exports = {
       }      
     },
   },
+    3: {
+        zoraTransferHelperROPSTEN: {
+            address: "0x0afB6A47C303f85c5A6e0DC6c9b4c2001E6987ED",
+            abi: ZORATRANSFERHELPERABI,
+        },
+        zoraModuleManagerROPSTEN: {
+            address: "0x3120f8A161bf8ae8C4287A66920E7Fd875b41805",
+            abi: ZORAMODULEMANAGERABI,
+        },
+        zoraAsksV1_1ModuleROPSTEN: {
+            address: "0x03abaccb86f7bc2990181b71c2ef85927bf41044",
+            abi: ZORAASKSV1_1MODULEABI,
+        },        
+        
+        contracts: {
+            lostandFoundContract4: {
+                address: "0xd373B9C8acc3439d42359bDAd3a0e3cC4BD0Ff66",
+                abi: LOSTANDFOUNDCONTRACT4ABI,
+        }      
+    },
+  },  
 };
