@@ -66,7 +66,11 @@ function OldEnglish({
       const nftMetadataFetch = await fetch(nftMetadataURL); 
 
       //===== CUSTOM UPDATE
-      const seller = await readContracts[zoraAsksContract].askForNFT(lostandfoundNFTContractAddress, id);
+      const seller = {seller: '0x0000000000000000000000000000000000000000', sellerFundsRecipient: '0x0000000000000000000000000000000000000000', askCurrency: '0x0000000000000000000000000000000000000000', findersFeeBps: 0, askPrice: BigNumber} ;
+      
+      //^ this sets all asks to be inactive. line below is the actual zora querying code
+      /* readContracts[zoraAsksContract].askForNFT(lostandfoundNFTContractAddress, id); */
+
       const ownerAddress = await readContracts[lostandfoundNFTContract].ownerOf(id);
       const ownerAddressCleaned = ownerAddress.toString().toLowerCase();
       //===== CUSTOM UPDATE
@@ -74,6 +78,8 @@ function OldEnglish({
       try {
         const nftMetadataObject = await nftMetadataFetch.json();
         const collectibleUpdate = {};
+
+        console.log(nftMetadataObject);
 
         //===== CUSTOM UPDATE, added askSeller: seller and nftOwner: ownerAddress as key:value pairs
         collectibleUpdate[id] = { id: id, uri: tokenURI, askSeller: seller, nftOwner: ownerAddressCleaned, ...nftMetadataObject};
