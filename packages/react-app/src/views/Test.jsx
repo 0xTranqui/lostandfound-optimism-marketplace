@@ -4,7 +4,7 @@ import { Button, Form, notification, Select } from "antd";
 
 //========== my custom import
 import "./Mint.css";
-import LF_Logo_V2_5 from "./LF_Logo_V2_5.png";
+import LF_Logo_Blueprint from "./LF_Logo_Blueprint_0x.png";
 import Premint_Artwork from "./Untitled_Artwork.png";
 import Confetti from 'react-confetti';
 import { useWindowWidth, useWindowHeight } from '@react-hook/window-size';
@@ -18,6 +18,8 @@ import { NftSwapV4 } from '@traderxyz/nft-swap-sdk';
 
 const { ERC721Order, NFTOrder } = require("@0x/protocol-utils");
 const utils = require("@0x/utils");
+
+
 
 //== new imports for the 0x marketplace
 
@@ -192,7 +194,7 @@ function OldEnglish({
       }   
 
       
-      const fillTx = await nftSwapSdk.fillpreSignERC721Order(onchainOrder);
+      const fillTx = await nftSwapSdk.fillSignedOrder(reconstructedOnchainOrder);
       const fillTxReceipt = await nftSwapSdk.awaitTransactionHash(fillTx);
 /*       console.log('Filled order! 🎉', fillTxReceipt.transactionHash);  */
    
@@ -203,7 +205,7 @@ function OldEnglish({
       <div className="mint">
          <div className="beforeMintRender">
             <div className="mintPageExplanation">
-               <img className="logoWidth" src={LF_Logo_V2_5}></img>
+               <img className="logoWidth" src={LF_Logo_Blueprint}></img>
                <br /> 
                <div className="mintPageExplanationBody">
                   <Button

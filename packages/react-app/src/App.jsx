@@ -27,7 +27,7 @@ import { useStaticJsonRPC } from "./hooks";
 
 //====MY CUSTOM IMPORTS
 import mainnetZoraAddresses from "@zoralabs/v3/dist/addresses/3.json";
-import linedPaperBackground from "./Lined_Paper_Background_For_Site.png";
+import linedPaperBackground from "./graph_paper_background_0x.png";
 //====MY CUSTOM IMPORTS
 
 const { ethers } = require("ethers");

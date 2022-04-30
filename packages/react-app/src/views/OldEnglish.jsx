@@ -7,6 +7,7 @@ import { ethers, BigNumber } from "ethers";
 import mainnetZoraAddresses from "@zoralabs/v3/dist/addresses/3.json"; // Rinkeby addresses, 1.json would be Rinkeby Testnet 
 import "./Marketplace.css";
 import LF_Logo_V2_5 from "./LF_Logo_V2_5.png";
+import LF_Logo_Blueprint from "./LF_Logo_Blueprint_0x.png";
 //========== MY CUSTOM IMPORTS
 
 function OldEnglish({
@@ -67,7 +68,7 @@ function OldEnglish({
 
       //===== CUSTOM UPDATE
       const seller = {seller: '0x0000000000000000000000000000000000000000', sellerFundsRecipient: '0x0000000000000000000000000000000000000000', askCurrency: '0x0000000000000000000000000000000000000000', findersFeeBps: 0, askPrice: BigNumber} ;
-      
+
       //^ this sets all asks to be inactive. line below is the actual zora querying code
       /* readContracts[zoraAsksContract].askForNFT(lostandfoundNFTContractAddress, id); */
 
@@ -511,7 +512,7 @@ function OldEnglish({
     <div className="OldEnglish">
       <div className="beforeTokenRender"> 
         <div >
-          <img className="logoWidth" src={LF_Logo_V2_5}></img>
+          <img className="logoWidth" src={LF_Logo_Blueprint}></img>
         </div>
         <div className="ownershipFilterWrapper">
           <div className="ownershipFilterOptions">

@@ -4,8 +4,8 @@ import { Button, Form, notification, Select } from "antd";
 
 //========== my custom import
 import "./Mint.css";
-import LF_Logo_V2_5 from "./LF_Logo_V2_5.png";
-import Premint_Artwork from "./Untitled_Artwork.png";
+import LF_Logo_Blueprint from "./LF_Logo_Blueprint_0x.png";
+import Premint_Artwork from "./questionMark_0x.png";
 import Confetti from 'react-confetti';
 import { useWindowWidth, useWindowHeight } from '@react-hook/window-size';
 //========== my custom import
@@ -103,7 +103,7 @@ function OldEnglish({
       <div className="mint">
          <div className="beforeMintRender">
             <div className="mintPageExplanation">
-               <img className="logoWidth" src={LF_Logo_V2_5}></img>
+               <img className="logoWidth" src={LF_Logo_Blueprint}></img>
                <br /> 
                <div className="mintPageExplanationBody" >
                {"" + maxSupply - totalSupply} / {"" + maxSupply} PIECES REMAIN

@@ -106,7 +106,7 @@ html {
 }
 
 .marketplaceButton {
-  background: url("./views/buttons/marketplaceButton_V2.png");
+  background: url("./views/buttons/marketplaceButton_0x.png");
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
@@ -118,7 +118,7 @@ html {
 }
 
 .mintButton {
-  background: url("./views/buttons/mintButton_V2.png");
+  background: url("./views/buttons/mintButton_0x.png");
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
@@ -129,7 +129,7 @@ html {
 }
 
 .aboutButton {
-  background: url("./views/buttons/aboutButton_V2.png");
+  background: url("./views/buttons/aboutButton_0x.png");
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
