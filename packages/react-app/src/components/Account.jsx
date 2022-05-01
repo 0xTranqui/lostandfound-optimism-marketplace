@@ -62,18 +62,18 @@ export default function Account({
   return (
     <div
     style={{
-/*       border: "2px solid orange", */
       display: "flex",
       flexDirection: "row",
       justifyContent: "end",
+      alignItems: "center",
       textAlign: "start",
-      fontSize: "1.5rem"
+      fontSize: "1.5rem",
       }}
     >
       {minimized ? (
         ""
       ) : (
-        <span>
+        <span style={{ height: "auto", marginBottom: "0", paddingBottom: "0"}} >
           {address ? (
             <Address_Header address={address} ensProvider={mainnetProvider} blockExplorer={blockExplorer} />
           ) : (
@@ -101,7 +101,7 @@ export default function Account({
         (web3Modal?.cachedProvider ? (
           <Button
             key="logoutbutton"
-            style={{ fontSize: "1.5rem", marginLeft: 8, paddingBottom: 0, paddingTop: 0, color: "#3e190f", border: "3px solid #3e190f", display: "flex", flexDirection: "row", alignItems: "center", alignSelf: "center" }}
+            style={{ height: "auto", fontSize: "1.5rem", marginLeft: 8, paddingBottom: 0, paddingTop: 0, color: "#f7f8f9", backgroundColor: "#425688", border: "3px solid #203466", display: "flex", flexDirection: "row", alignItems: "center", alignSelf: "center" }}
             shape="round"
             size="large"
             onClick={logoutOfWeb3Modal}
@@ -111,7 +111,7 @@ export default function Account({
         ) : (
           <Button
             key="loginbutton"
-            style={{ verticalAlign: "middle", marginLeft : 8, color: "#3e190f", border: "3px solid #3e190f" }}
+            style={{ verticalAlign: "middle", marginLeft : 8, color: "#f7f8f9", backgroundColor: "#425688", border: "3px solid #203466" }}
             shape="round"
             size="large"
             /* type={minimized ? "default" : "primary"}     too many people just defaulting to MM and having a bad time */

@@ -44,13 +44,18 @@
    flex-wrap: nowrap;
    gap: 1%; 
    justify-content: center;
+
 /*    justify-self: end; */
 }
 
 .ownershipFilterOptions {
-   color: #3e190f;
+   background-color: #203466;
+   border: 1px transparent solid;
+   border-radius: 20px;
+   color: #f7f8f9;
    font-size: 2rem;
    width: auto;
+   padding: 0px 3px;
 }
 
 .ownershipFilterSwitch {
@@ -87,8 +92,8 @@
 
 
 .cardHeaders {
-   color: white;
-   background-color: #3e190f;
+   color: #f7f8f9;
+   background-color: #203466;
    font-size: 1.5rem;
    height: auto;
    display: flex;
@@ -112,7 +117,7 @@
 }
 
 .cardFooters {
-   background-color: #3e190f;
+   background-color: #203466;
    margin: 0;
    padding: 0
    /* border: 2px solid blue; */
@@ -126,8 +131,8 @@
 
 .listingStatusManager {
    display: grid;
-   color: white;
-   background-color: #3e190f;
+   color: #f7f8f9;
+   background-color: #203466;
    font-weight: bold;
    grid-template-rows: 1fr 1fr;
    grid-template-columns: 1fr 1fr;
@@ -303,7 +308,7 @@
 
 .marketplaceManager {
    display: grid;
-   background-color: #3e190f;
+   background-color: #203466;
    width: 97%;
    margin-top: 7px;
    padding-bottom: 1px;

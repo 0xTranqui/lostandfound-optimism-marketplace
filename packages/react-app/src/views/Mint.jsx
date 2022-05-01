@@ -169,8 +169,8 @@ function OldEnglish({
                   onFinishFailed={onFinishFailed}
                >
                   <Form.Item
-                  label={<label style={{ color: "#3e190f", fontSize: "1.5rem" }}>QUANTITY :</label>}
-                  style={{ display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center"}}
+                  label={<label style={{ backgroundColor: "#203466", border: "1px solid transparent", borderRadius: "20px", padding: "3px 5px", color: "#f7f8f9", fontSize: "1.5rem" }}>QUANTITY</label>}
+                  style={{  display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center"}}
                   name="numberOfTokens"
                   rules={[
                      {
@@ -179,13 +179,13 @@ function OldEnglish({
                      },
                   ]}
                   >
-                     <Select size="large" style={{ marginTop: 0, marginBottom: 0, padding: 0, color: "white", fontSize: "1.2rem", backgroundColor: "#9b8deb", border: "2px #3d3280 solid", borderRadius: 10, width: "auto"}} >
+                     <Select size="large" style={{ marginTop: 0, marginBottom: 0, padding: 0, color: "white", fontSize: "1.2rem", backgroundColor: "#425688", border: "3px #203466 solid", borderRadius: 10, width: "auto"}} >
                         <Select.Option value="1">1</Select.Option>
                         <Select.Option value="2">2</Select.Option>
                      </Select>  
                   </Form.Item>
                   <Form.Item>
-                     <Button type="primary" style={{ fontSize: "1.2rem", backgroundColor: "#72a500", border: "2px solid #005a00", borderRadius: 10, color: "#F0F8EA", height: "auto", width: "auto" }} htmlType="submit" loading={mint}>MINT !</Button>
+                     <Button type="primary" style={{ fontSize: "1.2rem", backgroundColor: "#425688", border: "3px solid #203466", borderRadius: 10, color: "#f7f8f9", height: "auto", width: "auto" }} htmlType="submit" loading={mint}>MINT !</Button>
                   </Form.Item>               
                </Form>
             </div>
@@ -219,14 +219,14 @@ function OldEnglish({
                      </a>
                      <Link to="/">
                         <Button
-                        style={{ backgroundColor: "#3e190f", color: "white", borderRadius: 20, fontSize: "1.5rem", height: "auto", marginTop: "20px" }}
+                        style={{ backgroundColor: "#203466", color: "#f7f8f9", border: "none", borderRadius: 20, fontSize: "1.5rem", height: "auto", marginTop: "20px" }}
                         >
                            VIEW IN MARKETPLACE
                         </Button>
                      </Link>
                      <Link to="/">
                         <Button
-                        style={{ backgroundColor: "#3e190f", color: "white", borderRadius: 20, fontSize: "1.5rem", height: "auto", marginTop: "20px" }}
+                        style={{ backgroundColor: "#203466", color: "#f7f8f9", border: "none", borderRadius: 20, fontSize: "1.5rem", height: "auto", marginTop: "20px" }}
                         >
                            VIEW IN MARKETPLACE
                         </Button>
@@ -252,7 +252,7 @@ function OldEnglish({
                         </a>
                         <Link to="/">
                            <Button
-                           style={{ backgroundColor: "#3e190f", color: "white", borderRadius: 20, fontSize: "1.5rem", height: "auto", marginTop: "20px" }}
+                           style={{ backgroundColor: "#203466", color: "#f7f8f9", border: "none", borderRadius: 20, fontSize: "1.5rem", height: "auto", marginTop: "20px" }}
                            >
                               VIEW IN MARKETPLACE
                            </Button>

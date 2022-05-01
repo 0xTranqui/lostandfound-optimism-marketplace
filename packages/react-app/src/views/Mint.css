@@ -29,7 +29,8 @@
    display: flex;
    flex-direction: column;
    align-items: center;
-   color: #3e190f;
+   color: #f7f8f9;
+   /*   -webkit-text-stroke: 1px #203466; */
 }
 
 .logoWidth {
@@ -45,6 +46,10 @@
 }
 
 .mintPageExplanationBody {
+   background-color: #203466;
+   border: 1px solid transparent;
+   border-radius: 20px;
+   padding: 0px 5px;
    font-size: 1.5rem;
    margin-bottom: 5px;
 
@@ -89,8 +94,12 @@
    grid-column: 1 / 2;
    margin-top: 10px;
    margin-bottom: 10px;
-   font-size: 2rem;
-   color: #3e190f;
+   font-size: 3rem;
+   color: #f7f8f9;
+   -webkit-text-stroke: 2.5px #203466;
+/*    background-color: #425688;
+   border: 2px solid #203466;
+   padding: 0px 3px; */
 }
 
 .oneMintedNFTRender {
@@ -119,8 +128,9 @@
    grid-column: 1 / 2;
    margin-top: 10px;
    margin-bottom: 10px;
-   font-size: 2rem;
-   color: #3e190f;
+   font-size: 3rem;
+   color: #f7f8f9;
+   -webkit-text-stroke: 2.5px #203466;
 }
 
 .twoMintedNFTRenderTitle2 {
@@ -129,8 +139,9 @@
    grid-column: 2 / 3;
    margin-top: 10px;
    margin-bottom: 10px;
-   font-size: 2rem;
-   color: #3e190f;
+   font-size: 3rem;
+   color: #f7f8f9;
+   -webkit-text-stroke: 2.5px #203466;
    
 }
 

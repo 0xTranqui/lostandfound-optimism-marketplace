@@ -12,24 +12,27 @@
    display: flex;
    flex-direction: row;
    flex-wrap: wrap;
-   color: #3e190f;
+   color: #f7f8f9;
 }
 
 .sections {
    width: 100%;
-   margin-left: 15%;
-   margin-right: 10%;
+   margin-left: 8%;
+   margin-right: 8%;
+   padding-left: 2%;
+   padding-right: 2%;
    text-align: start;
    margin-bottom: 2%;
+   background-color: hsla(223, 52%, 26%, .9)
 }
 
 .aboutPageHeaders {
-   font-size: 2rem;
+   font-size: 2.5rem;
    font-weight: bold;
 
 }
 
 .aboutPageBody {
-   font-size: 1.5rem;
-   color: #3e190f;
+   font-size: 1.7rem;
+   color: #f7f8f9;
 }

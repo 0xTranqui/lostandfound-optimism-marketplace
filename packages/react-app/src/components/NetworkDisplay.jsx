@@ -88,12 +88,18 @@ function NetworkDisplay({ NETWORKCHECK, localChainId, selectedChainId, targetNet
       <div
       className="headerNetworkDisplay"
       style={{
-  /*       border: "2px solid black", */
-        color: "#3e190f",
+        border: "3px solid #203466",
+        backgroundColor: "#425688",
+        borderRadius: "20px",
+        color: "#f7f8f9",
         display: "flex",
         flexDirection: "row",
         justifyContent: "end", 
-        alignItems: "end"
+        justifySelf: "end",
+        alignItems: "end",
+        width: "fit-content",
+        padding: "0px 5px",
+        marginBottom: "5px"
       }}>
         NETWORK : {targetNetwork.name.toUpperCase()}
       </div>

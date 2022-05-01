@@ -75,7 +75,7 @@ function App(props) {
   const zmmContract = "zoraModuleManagerROPSTEN"; //change this in external_contracts.js to convert to rinkeby/mainnet
   const zoraAsksContract = "zoraAsksV1_1ModuleROPSTEN"; //change this in external_contracts.js to convert to rinkeby/mainnet
   const lostandfoundNFTContract = "lostandFoundContract4"; // update address of lostandFoundContract2 if redeploying an identical nft contract for testing purposes
-  const lostandfoundNFTContractAddress = "0xd373B9C8acc3439d42359bDAd3a0e3cC4BD0Ff66"; // change this to the nft contract you want to be interacting with
+  const lostandfoundNFTContractAddress = "0x9Fd7ad2ECF7510EddCf0e6a345188d9dF23805ac"; // change this to the nft contract you want to be interacting with
   //======my custom additions
 
   // specify all the chains your app is available on. Eg: ['localhost', 'mainnet', ...otherNetworks ]
@@ -294,6 +294,7 @@ function App(props) {
           />
           <Account
             className="headerAccount"
+            style={{height: "auto"}}
             address={address}
             localProvider={localProvider}
             userSigner={userSigner}

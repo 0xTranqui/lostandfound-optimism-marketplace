@@ -242,7 +242,7 @@ function OldEnglish({
           </Form.Item>          
           <Form.Item>
             <Button
-            style={{ backgroundColor: "#ffb300", color: "#c43b00", border: "4px solid #c43b00", fontSize: "1.25rem", height: "auto", borderRadius: 20  }} 
+            style={{ backgroundColor: "#425688", color: "#f7f8f9", border: "4px solid #203466", fontSize: "1.25rem", height: "auto", borderRadius: 20  }} 
             type="primary"
             htmlType="submit"
             loading={listing}>
@@ -521,7 +521,7 @@ function OldEnglish({
           <Switch
             className="ownershipFilterSwitch"
             disabled={loadingOldEnglish}
-            style={{ height: "60%", width: "5%", border: "4px #3e190f solid", backgroundColor: "#c1a79f" }}
+            style={{ height: "60%", width: "5%", border: "4px #203466 solid", backgroundColor: "#425688" }}
             value={mine}
             onChange={() => {
               setMine(!mine);
@@ -655,7 +655,7 @@ function OldEnglish({
                               <Button
                                 className="marketplaceApprovalButton"
                                 disabled={false}
-                                style={{  backgroundColor: "white", color: "#3e190f", borderRadius: 2, border: "1px solid black", width: "97%", fontSize: "1.2rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} 
+                                style={{  backgroundColor: "#f7f8f9", color: "#203466", borderRadius: 2, border: "1px solid black", width: "97%", fontSize: "1.2rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} 
                                 type="primary"
                               >
                                 APPROVE MARKETPLACE PROTOCOLS
