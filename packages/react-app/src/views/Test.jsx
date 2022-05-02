@@ -15,6 +15,7 @@ var count = 0; // this saves count that is used to determine what state setting 
 
 //==== new imports for the 0x marketplace
 import { NftSwapV4 } from '@traderxyz/nft-swap-sdk';
+import { MsgValueCannotEqualZeroError } from "@0x/utils/lib/src/revert_errors/exchange-forwarder/revert_errors";
 
 const { ERC721Order, NFTOrder } = require("@0x/protocol-utils");
 const utils = require("@0x/utils");
@@ -135,7 +136,7 @@ function OldEnglish({
       const walletAddressUserA = '0x153D2A196dc8f1F6b9Aa87241864B3e4d4FEc170'
       const nftToSwapUserA = lostandfound_token_0;
 
-      const wallerAddressUserB = '0x806164c929Ad3A6f4bd70c2370b3Ef36c64dEaa8'
+      const walletAddressUserB = '0x806164c929Ad3A6f4bd70c2370b3Ef36c64dEaa8'
       const ethToSwapUserB = price_to_list_for;
 
       const nftSwapSdk = new NftSwapV4(localProvider, userSigner, CHAIN_ID);
@@ -178,9 +179,32 @@ function OldEnglish({
 
    const fillOrder = async () => {
 
+      const CHAIN_ID = 3; //3 = ropsten
+
       console.log ("fillOrder function running");
 
+      const lostandfound_token_0 = {
+         tokenAddress: '0xd373B9C8acc3439d42359bDAd3a0e3cC4BD0Ff66', //ropsten deployment
+         tokenId: '0', //this should be angel
+         type: 'ERC721'
+      }
+
+      const price_to_list_for = {
+         tokenAddress: "0x0000000000000000000000000000000000000000", //nulladdress so that lister gets paid in eth
+         amount: "10000000000000000", //16 zeroes aka 0.01eth
+         type: 'ERC20'
+      }      
+
+      const walletAddressUserB = '0x806164c929Ad3A6f4bd70c2370b3Ef36c64dEaa8'
+      const ethToSwapUserB = price_to_list_for;
+
       const nftSwapSdk = new NftSwapV4(localProvider, userSigner, CHAIN_ID);
+
+   // Check if we need to approve the NFT for swapping
+      const approvalStatusForUserB = await nftSwapSdk.loadApprovalStatus(
+         ethToSwapUserB,
+         walletAddressUserB
+      );      
 
       if (!approvalStatusForUserB.contractApproved) {
          const approvalTx = await nftSwapSdk.approveTokenOrNftByAsset(
@@ -193,8 +217,29 @@ function OldEnglish({
          ); */
       }   
 
+      reconstructedOnchainOrder = [
+         0, // trade direction
+         "0x153d2a196dc8f1f6b9aa87241864b3e4d4fec170", // maker address
+         "0x0000000000000000000000000000000000000000", // taker address 
+         "2524604400", // expiry from creation of original order?
+         "100131415900000000000000000000000000000037447434039469235119755219451442562890", // nonce
+         "0x0000000000000000000000000000000000000000", // erc20token
+         "10000000000000000", // erc20 token amount (hardhcoded to 0.01 eth)
+         [], // fees (none included atm)
+         "0xd373b9c8acc3439d42359bdad3a0e3cc4bd0ff66", // erc721 nft contract
+         "0", // erc721 nft contract token id
+         [] // erc721 token properties (none included atm)
+      ]
+
+      nullSignatureStruct = [
+         4 // This value indicates that the order maker has previously marked the order as fillable on-chain. The remaining fields in the Signature struct will be ignored.
+         // link to where this explanation comes from: https://docs.0x.org/protocol/docs/signatures
+      ]
       
-      const fillTx = await nftSwapSdk.fillSignedOrder(reconstructedOnchainOrder);
+      const fillTx = await nftSwapSdk.exchangeProxy.buyERC721(
+         reconstructedOnchainOrder,
+         nullSignatureStruct
+      );
       const fillTxReceipt = await nftSwapSdk.awaitTransactionHash(fillTx);
 /*       console.log('Filled order! 🎉', fillTxReceipt.transactionHash);  */
    
