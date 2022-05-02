@@ -14,8 +14,9 @@ var count = 0; // this saves count that is used to determine what state setting 
 
 
 //==== new imports for the 0x marketplace
-import { NftSwapV4 } from '@traderxyz/nft-swap-sdk';
+import { NftSwapV4, ETH_ADDRESS_AS_ERC20 } from '@traderxyz/nft-swap-sdk';
 import { MsgValueCannotEqualZeroError } from "@0x/utils/lib/src/revert_errors/exchange-forwarder/revert_errors";
+import { ethers, BigNumber } from "ethers";
 
 const { ERC721Order, NFTOrder } = require("@0x/protocol-utils");
 const utils = require("@0x/utils");
@@ -128,7 +129,7 @@ function OldEnglish({
       }
 
       const price_to_list_for = {
-         tokenAddress: "0x0000000000000000000000000000000000000000", //nulladdress so that lister gets paid in eth
+         tokenAddress: ETH_ADDRESS_AS_ERC20, //nulladdress so that lister gets paid in eth
          amount: "10000000000000000", //16 zeroes aka 0.01eth
          type: 'ERC20'
       }
@@ -190,7 +191,7 @@ function OldEnglish({
       }
 
       const price_to_list_for = {
-         tokenAddress: "0x0000000000000000000000000000000000000000", //nulladdress so that lister gets paid in eth
+         tokenAddress: ETH_ADDRESS_AS_ERC20, //nulladdress so that lister gets paid in eth
          amount: "10000000000000000", //16 zeroes aka 0.01eth
          type: 'ERC20'
       }      
@@ -217,13 +218,14 @@ function OldEnglish({
          ); */
       }   
 
-      reconstructedOnchainOrder = [
+      const reconstructedOnchainOrder = [
          0, // trade direction
          "0x153d2a196dc8f1f6b9aa87241864b3e4d4fec170", // maker address
          "0x0000000000000000000000000000000000000000", // taker address 
          "2524604400", // expiry from creation of original order?
-         "100131415900000000000000000000000000000037447434039469235119755219451442562890", // nonce
-         "0x0000000000000000000000000000000000000000", // erc20token
+         "100131415900000000000000000000000000000215194807203205578691700758438507148348",
+          // nonce
+         ETH_ADDRESS_AS_ERC20, // erc20token
          "10000000000000000", // erc20 token amount (hardhcoded to 0.01 eth)
          [], // fees (none included atm)
          "0xd373b9c8acc3439d42359bdad3a0e3cc4bd0ff66", // erc721 nft contract
@@ -231,15 +233,18 @@ function OldEnglish({
          [] // erc721 token properties (none included atm)
       ]
 
-      nullSignatureStruct = [
+      const nullSignatureStruct = [
          4 // This value indicates that the order maker has previously marked the order as fillable on-chain. The remaining fields in the Signature struct will be ignored.
          // link to where this explanation comes from: https://docs.0x.org/protocol/docs/signatures
       ]
-      
+
       const fillTx = await nftSwapSdk.exchangeProxy.buyERC721(
          reconstructedOnchainOrder,
-         nullSignatureStruct
+         nullSignatureStruct,
+         "0x806164c929Ad3A6f4bd70c2370b3Ef36c64dEaa8", // taker address
+         { value: BigNumber.from("10000000000000000").toString() }
       );
+
       const fillTxReceipt = await nftSwapSdk.awaitTransactionHash(fillTx);
 /*       console.log('Filled order! 🎉', fillTxReceipt.transactionHash);  */
    
