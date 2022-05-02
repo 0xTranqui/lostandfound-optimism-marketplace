@@ -11,5 +11,11 @@ export default defineConfig({
          lostandFoundContract3: '0x288FC01ACcf7E053cD594AA18eff3e2D549600b7',
          lostandFoundContract4: '0xa4248aC1a4Fc557134802f39cddF830Fde6DdA06',
       },
+      ropsten: {
+         zeroExERC721OrdersFeature: "0x72657b338391c6A55120EB786a2b4FecED7D3Be2"
+      },
+      optimism: {
+         zeroExERC721OrdersFeature: "0x0C58C1170f1DEd633862A1166f52107490a9C594"
+      }
    },
 })

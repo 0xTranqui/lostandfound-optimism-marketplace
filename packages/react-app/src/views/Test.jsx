@@ -15,11 +15,12 @@ var count = 0; // this saves count that is used to determine what state setting 
 
 //==== new imports for the 0x marketplace
 import { NftSwapV4, ETH_ADDRESS_AS_ERC20 } from '@traderxyz/nft-swap-sdk';
-import { MsgValueCannotEqualZeroError } from "@0x/utils/lib/src/revert_errors/exchange-forwarder/revert_errors";
 import { ethers, BigNumber } from "ethers";
 
+
+/* import { MsgValueCannotEqualZeroError } from "@0x/utils/lib/src/revert_errors/exchange-forwarder/revert_errors";
 const { ERC721Order, NFTOrder } = require("@0x/protocol-utils");
-const utils = require("@0x/utils");
+const utils = require("@0x/utils"); */
 
 
 
@@ -124,7 +125,7 @@ function OldEnglish({
 
       const lostandfound_token_0 = {
          tokenAddress: '0xd373B9C8acc3439d42359bDAd3a0e3cC4BD0Ff66', //ropsten deployment
-         tokenId: '1', //this should be maxim
+         tokenId: '2', //this should be remy
          type: 'ERC721'
       }
 
@@ -172,9 +173,19 @@ function OldEnglish({
       console.log("onchainOrder finished!")
    }
 
-/*     //=======0x Protocol Cancel Order Flow===========
+    //=======0x Protocol Cancel Order Flow===========
+
+   const cancelOrder = async () => {
+      
+      const CHAIN_ID = 3; //3 = ropsten
+
+      const nftSwapSdk = new NftSwapV4(localProvider, userSigner, CHAIN_ID);
+
+      const orderNonce = "100131415900000000000000000000000000000160812848772371044860429851089384113904";
    
-   await nftSwapSdk.cancelOrder(onchainOrder); */
+      const cancelOrder = await nftSwapSdk.exchangeProxy.cancelERC721Order(orderNonce);
+   
+   }
    
     //=======0x Protocol Fill Order Flow===========
 
@@ -289,7 +300,8 @@ function OldEnglish({
                <div className="mintPageExplanationBody">
                   <Button
                   style={{ backgroundColor: "black", color: "white", border: "4px solid black", fontSize: "1.25rem", height: "auto", borderRadius: 20  }} 
-                  type="primary"                  
+                  type="primary"
+                  onClick={cancelOrder}                  
                   >
                      Cancel Listing
                   </Button>

@@ -76,6 +76,8 @@ function App(props) {
   const zoraAsksContract = "zoraAsksV1_1ModuleROPSTEN"; //change this in external_contracts.js to convert to rinkeby/mainnet
   const lostandfoundNFTContract = "lostandFoundContract4"; // update address of lostandFoundContract2 if redeploying an identical nft contract for testing purposes
   const lostandfoundNFTContractAddress = "0x9Fd7ad2ECF7510EddCf0e6a345188d9dF23805ac"; // change this to the nft contract you want to be interacting with
+  
+  const zeroExErc721StatusContract = "zeroExErc721StatusROPSTEN";
   //======my custom additions
 
   // specify all the chains your app is available on. Eg: ['localhost', 'mainnet', ...otherNetworks ]
