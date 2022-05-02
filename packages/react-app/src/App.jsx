@@ -272,7 +272,7 @@ function App(props) {
               </button>
             </Link>
           </Menu.Item>
-          <Menu.Item
+{/*           <Menu.Item
             style={{width: "29%", margin: 0, padding: 0 }}
             key="/test"
           >
@@ -281,7 +281,7 @@ function App(props) {
                 Test
               </Button>
             </Link>
-          </Menu.Item>          
+          </Menu.Item>  */}         
         </Menu>
         
         <div className="networkAndAccountWrapper">

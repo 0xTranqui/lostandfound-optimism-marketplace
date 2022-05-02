@@ -75,7 +75,7 @@ export default function Address_Header(props) {
   }
 
   return (
-    <span style={{ color: "#f7f8f9", border: "3px #203466 solid", backgroundColor: "#425688", borderRadius: "20px", margin: 0, padding: "3px"}}>
+    <span style={{ color: "#f7f8f9", border: "3px #203466 solid", backgroundColor: "#425688", borderRadius: "20px", margin: 0, padding: "4px 7px"}}>
       <span 
       className="headerWalletText"
       >
