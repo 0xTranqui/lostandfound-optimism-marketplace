@@ -174,10 +174,10 @@
 .approvals_and_functions_wrapper {
    
    /* not in use but used for naming purposes*/
-   /*    border: 2px solid red; */
+/*       border: 2px solid red; */
 }
 
-.popoverMaster {
+.popoverMaster { 
    display: grid;
    grid-row: 1 / 2;
    grid-column: 1 / 2;
@@ -310,9 +310,9 @@
    display: grid;
    background-color: #203466;
    width: 97%;
-   margin-top: 7px;
-   padding-bottom: 1px;
-   grid-template: 1fr 1fr / 1fr 1fr;
+   margin-top: 0px;
+   padding-bottom: 5px;
+   grid-template: 1fr / 1fr 1fr 1fr ;
    gap: 7px;
 /*    border: 2px solid pink; */
 }

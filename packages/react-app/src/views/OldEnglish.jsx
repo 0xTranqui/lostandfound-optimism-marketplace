@@ -8,6 +8,8 @@ import mainnetZoraAddresses from "@zoralabs/v3/dist/addresses/3.json"; // Rinkeb
 import "./Marketplace.css";
 import LF_Logo_V2_5 from "./LF_Logo_V2_5.png";
 import LF_Logo_Blueprint from "./LF_Logo_Blueprint_0x.png";
+
+import { NftSwapV4, ETH_ADDRESS_AS_ERC20 } from '@traderxyz/nft-swap-sdk';
 //========== MY CUSTOM IMPORTS
 
 function OldEnglish({
@@ -22,6 +24,7 @@ function OldEnglish({
   localProvider,
   oldEnglishContract,
   balance,
+  userSigner,
 //========== MY CUSTOM IMPORTS
 /*   zoraTransferHelperContract, */
   zmmContract,
@@ -150,7 +153,7 @@ function OldEnglish({
     });
   }
 
-  //========== ZORA CREATE ASK FLOW ==========
+/*   //========== ZORA CREATE ASK FLOW ==========
   const [createAskForm] = Form.useForm();
   const createAsk = id => {
     const [listing, setListing] = useState(false);
@@ -231,7 +234,7 @@ function OldEnglish({
             <div>
               <Radio.Group>
                 <Radio onClick={createHandleClickFalse} value={""}>ADD FINDER'S FEE</Radio>                
-                <Radio onClick={createHandleClickTrue} value={"0x0000000000000000000000000000000000000000"}>NO FINDER'S FEE</Radio> {/*returns the zero address if no finder selected */}
+                <Radio onClick={createHandleClickTrue} value={"0x0000000000000000000000000000000000000000"}>NO FINDER'S FEE</Radio>
               </Radio.Group>
               <Input            
               style={{ marginTop: "5px", width: "50%" }}
@@ -252,9 +255,9 @@ function OldEnglish({
         </Form>
       </div>
     );
-  };  
+  };   */
 
-  //========== ZORA CREATE ASK FLOW ==========
+  //========== ZORA UPDATE ASK FLOW ==========
   const [setAskForm] = Form.useForm();
   const updateAskPrice = id => {
     const [set, setSet] = useState(false);
@@ -508,6 +511,232 @@ function OldEnglish({
     )
   }
 
+  //========== 0x Protocol Create Order Flow ==========
+  const [createOrderForm] = Form.useForm();
+  const createOrder = id => {
+    const [listing, setListing] = useState(false);
+
+    const CHAIN_ID = userSigner.provider._network && userSigner.provider._network.chainId; // 3 = ropsten, 10 = optimism
+
+    const nftSwapSdk = new NftSwapV4(localProvider, userSigner, CHAIN_ID);
+
+    const specificNftId = {
+      tokenAddress: lostandfoundNFTContractAddress, //ropsten deployment
+      tokenId: id,
+      type: 'ERC721'
+    }
+    
+    const walletAddressUserA = address;
+    const nftToSwapUserA = specificNftId;  
+
+    return (
+      <div>
+        <Form
+          layout={"horizontal"}
+          form={createOrderForm}
+          name="create order"
+          initialValues={{
+            listingPrice: "",
+          }}
+          onFinish={async values => {
+            setListing(true);
+            try {
+              const approvalStatusForUserA = await nftSwapSdk.loadApprovalStatus(
+                nftToSwapUserA,
+                walletAddressUserA
+              );
+              console.log("approval check: ", approvalStatusForUserA);
+          
+              // If we do need to approve User A's NFT for swapping, let's do that now
+              if (!approvalStatusForUserA.contractApproved) {
+                const txCur = await nftSwapSdk.approveTokenOrNftByAsset(
+                nftToSwapUserA,
+                walletAddressUserA
+                );
+              const approvalTxReceipt = await txCur.wait();
+          /*          console.log(
+              `Approved ${assetsToSwapUserA[0].tokenAddress} contract to swap with 0x v4 (txHash: ${approvalTxReceipt.transactionHash})`
+              ); */
+              }   
+
+              console.log("starting order build...")
+              const order = nftSwapSdk.buildOrder(
+                nftToSwapUserA,
+                {
+                  tokenAddress: ETH_ADDRESS_AS_ERC20,
+                  amount: ethers.utils.parseUnits(values["listingPrice"], 'ether').toString(), // THIS IS THE ONLY VALUE GETTING UPDATED IN FORM
+                  type: 'ERC20'
+                },
+                walletAddressUserA
+              );
+              const txCur2 = await nftSwapSdk.exchangeProxy.preSignERC721Order(order); 
+              await txCur2.wait();
+              setListing(false);
+            } catch (e) {
+              console.log("create order failed", e)
+              setListing(false);
+            }
+          }}
+          onFinishFailed={onFinishFailed}
+        >
+          <Form.Item
+            style={{marginTop: 0, marignBottom: 0, paddingTop: 0, paddingBottom: 0}}              
+            name="listingPrice"
+            label="LIST PRICE "
+            rules={[
+              {
+                required: true,
+                message: "HOW MUCH ARE YOU LISTING THIS NFT FOR?",
+              },
+            ]}
+          >
+            <Input
+            addonAfter={"ETH"}
+            />
+          </Form.Item>
+          <Form.Item>
+          <Button
+            style={{ backgroundColor: "#425688", color: "#f7f8f9", border: "4px solid #203466", fontSize: "1.25rem", height: "auto", borderRadius: 20  }} 
+            type="primary"
+            htmlType="submit"
+            loading={listing}>
+              LIST
+            </Button>            
+          </Form.Item>   
+        </Form>
+      </div>
+    )
+  }
+
+
+
+
+
+
+
+
+ // Check if we need to approve the NFT for swapping
+/*     const approvalStatusForUserA = await nftSwapSdk.loadApprovalStatus(
+      nftToSwapUserA,
+      walletAddressUserA
+    );
+
+    // If we do need to approve User A's NFT for swapping, let's do that now
+    if (!approvalStatusForUserA.contractApproved) {
+      const approvalTx = await nftSwapSdk.approveTokenOrNftByAsset(
+      nftToSwapUserA,
+      walletAddressUserA
+      );
+    const approvalTxReceipt = await approvalTx.wait(); */
+/*          console.log(
+    `Approved ${assetsToSwapUserA[0].tokenAddress} contract to swap with 0x v4 (txHash: ${approvalTxReceipt.transactionHash})`
+    ); */
+/*     }   
+
+    // Create the order (Remember, User A initiates the trade, so User A creates the order)
+    const order = nftSwapSdk.buildOrder(
+      nftToSwapUserA,
+      ethToSwapUserB,
+      walletAddressUserA
+    );
+
+    // Sign the order (User A signs since they are initiating the trade)
+    console.log("onchainOrder getting made: ")
+    const onchainOrder = await nftSwapSdk.exchangeProxy.preSignERC721Order(order); 
+    console.log("onchainOrder finished!")
+
+  }   */
+
+   //========== 0x Protocol Cancel Order Flow ==========  
+  const cancelOrder = async () => {
+      
+    const CHAIN_ID = 3; //3 = ropsten
+
+    const nftSwapSdk = new NftSwapV4(localProvider, userSigner, CHAIN_ID);
+
+    const orderNonce = "100131415900000000000000000000000000000160812848772371044860429851089384113904";
+
+    const cancelOrder = await nftSwapSdk.exchangeProxy.cancelERC721Order(orderNonce); 
+
+  }
+
+    //=======0x Protocol Fill Order Flow===========
+
+    const fillOrder = async () => {
+
+      const CHAIN_ID = 3; // 3 = ropsten, 10 = optimism
+
+      console.log ("fillOrder function running");
+
+      const lostandfound_token_0 = {
+        tokenAddress: '0xd373B9C8acc3439d42359bDAd3a0e3cC4BD0Ff66', //ropsten nft contract deployment
+        tokenId: '0', //this should be angel
+        type: 'ERC721'
+      }
+
+      const price_to_list_for = {
+        tokenAddress: ETH_ADDRESS_AS_ERC20, 
+        amount: "10000000000000000", //16 zeroes aka 0.01eth
+        type: 'ERC20'
+      }      
+
+      const walletAddressUserB = '0x153D2A196dc8f1F6b9Aa87241864B3e4d4FEc170'
+      const ethToSwapUserB = price_to_list_for;
+
+      const nftSwapSdk = new NftSwapV4(localProvider, userSigner, CHAIN_ID);
+
+   // Check if we need to approve the NFT for swapping
+      const approvalStatusForUserB = await nftSwapSdk.loadApprovalStatus(
+        ethToSwapUserB,
+        walletAddressUserB
+      );      
+
+      if (!approvalStatusForUserB.contractApproved) {
+        const approvalTx = await nftSwapSdk.approveTokenOrNftByAsset(
+        ethToSwapUserB,
+        walletAddressUserB
+        );
+        const approvalTxReceipt = await approvalTx.wait();
+/*          console.log(
+        `Approved ${assetsToSwapUserA[0].tokenAddress} contract to swap with 0x v4 (txHash: ${approvalTxReceipt.transactionHash})`
+        ); */
+      }   
+
+      const reconstructedOnchainOrder = [
+        0, // trade direction (0 = sell, 1 = buy)
+        "0x806164c929Ad3A6f4bd70c2370b3Ef36c64dEaa8", // maker address
+        "0x0000000000000000000000000000000000000000", // taker address 
+        "2524604400", // expiry from creation of original order?
+        "100131415900000000000000000000000000000160812848772371044860429851089384113904",
+        // nonce
+        ETH_ADDRESS_AS_ERC20, // erc20token
+        "10000000000000000", // erc20 token amount (hardhcoded to 0.01 eth)
+        [], // fees (none included atm)
+        "0xd373b9c8acc3439d42359bdad3a0e3cc4bd0ff66", // erc721 nft contract
+        "2", // erc721 nft contract token id
+        [] // erc721 token properties (none included atm)
+      ]
+
+      const nullSignatureStruct = {
+        // These value indicates that the order maker has previously marked the order as fillable on-chain. The remaining fields in the Signature struct will be ignored.
+        // link to where this explanation comes from: https://docs.0x.org/protocol/docs/signatures         
+        "r": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "s": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "v": 0,
+        "signatureType": 4
+      }
+
+      const fillTx = await nftSwapSdk.exchangeProxy.buyERC721(
+        reconstructedOnchainOrder,
+        nullSignatureStruct,
+        "0x", // taker address
+        { value: BigNumber.from("10000000000000000").toString() }
+      );
+
+      const fillTxReceipt = await nftSwapSdk.awaitTransactionHash(fillTx);
+      console.log('Filled order! 🎉', fillTxReceipt.transactionHash); 
+    }
+
   return (
     <div className="OldEnglish">
       <div className="beforeTokenRender"> 
@@ -640,11 +869,13 @@ function OldEnglish({
                             PRICE : N/A
                             </div>
                             <div className="listingFindersFee">
-                            FINDER'S FEE : N/A
+                            ARTIST ROYALTY : 15%
                             </div>
                           </div>
                           { erc721TransferHelperApproved == false || zoraModuleManagerApproved == false ? ( // listing inactive  &  marketplace protocols not approved
                           <div className="approvals_and_functions_wrapper">
+{/* 
+  taking out approval button
                             <Popover
                               className="popoverMaster"
                               placement="top"
@@ -661,17 +892,31 @@ function OldEnglish({
                                 APPROVE MARKETPLACE PROTOCOLS
                               </Button>
                             </Popover>
+
+                             */}
                             <div className="marketplaceManager">
-                              <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">LIST</Button>
-                              <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">UPDATE</Button>
-                              <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">CANCEL</Button>
-                              <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">BUY</Button>
+                              <Popover
+                                placement="top"
+                                  content={() => {                                                        
+                                    return createOrder(id);
+                                  }}
+                                >
+                                <Button
+                                  style={{ borderRadius: 2, border: "1px solid black", backgroundColor: "white", color: "#3e190f", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }}
+                                  type="primary">
+                                  LIST
+                                </Button>
+                              </Popover>                                                                                                   
+                              <Button disabled={false} onClick={cancelOrder} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">CANCEL</Button>
+                              <Button disabled={false} onClick={fillOrder} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">BUY</Button>
                             </div>                             
                           </div>
                           ) : (
                             <>
                               { item.nftOwner == address.toLowerCase() ? ( // listing inactive  &  marketplace protocols approved  &  app user is owner
                                 <div className="approvals_and_functions_wrapper">
+{/* 
+    taking out approvals button
                                   <Button
                                     className="marketplaceApprovalButton"
                                     disabled={true}
@@ -679,7 +924,9 @@ function OldEnglish({
                                     type="primary"
                                   >
                                     MARKETPLACE PROTOCOLS ARE APPROVED
-                                  </Button>                             
+                                  </Button> 
+
+ */}
                                   <div className="marketplaceManager">
                                   <Popover
                                     placement="top"
@@ -689,13 +936,14 @@ function OldEnglish({
                                     >
                                       <Button style={{ borderRadius: 2, border: "1px solid black", backgroundColor: "white", color: "#3e190f", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">LIST</Button>
                                     </Popover>
-                                    <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">UPDATE</Button>
                                     <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">CANCEL</Button>
                                     <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">BUY</Button>                              
                                   </div>  
                                 </div> 
                                 ) : ( // listing inactive  &  marketplace protocols approved  &  user not owner
                                 <div className="approvals_and_functions_wrapper">
+{/* 
+    taking out approvals button
                                   <Button
                                     className="marketplaceApprovalButton"
                                     disabled={true}
@@ -704,9 +952,10 @@ function OldEnglish({
                                   >
                                     MARKETPLACE PROTOCOLS ARE APPROVED
                                   </Button>        
+
+                                   */}
                                   <div className="marketplaceManager">
                                     <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">LIST</Button>
-                                    <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">UPDATE</Button>
                                     <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">CANCEL</Button>
                                     <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">BUY</Button>
                                   </div> 
@@ -739,6 +988,8 @@ function OldEnglish({
                           </div>
                           { erc721TransferHelperApproved == false || zoraModuleManagerApproved == false ? ( // listing active  &  marketplace protocols not approved
                           <div className="approvals_and_functions_wrapper">
+{/* 
+    taking out approvals button
                             <Popover
                               className="popoverMaster"
                               placement="top"
@@ -755,9 +1006,10 @@ function OldEnglish({
                                 APPROVE MARKETPLACE PROTOCOLS
                               </Button>
                             </Popover>
+
+                             */}
                             <div className="marketplaceManager">
                               <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">LIST</Button>
-                              <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">UPDATE</Button>
                               <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">CANCEL</Button>
                               <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">BUY</Button>
                             </div>                             
@@ -766,6 +1018,8 @@ function OldEnglish({
                             <>
                               { item.nftOwner == address.toLowerCase() ? ( // listing active  &  marketplace protocols approved  &  app user is owner
                                 <div className="approvals_and_functions_wrapper">
+{/* 
+    taking out approvals button
                                   <Button
                                     className="marketplaceApprovalButton"
                                     disabled={true}
@@ -773,17 +1027,11 @@ function OldEnglish({
                                     type="primary"
                                   >
                                     MARKETPLACE PROTOCOLS ARE APPROVED
-                                  </Button>                             
+                                  </Button>  
+
+ */}
                                   <div className="marketplaceManager">                             
                                     <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">LIST</Button>                                
-                                    <Popover
-                                      placement="top"                                                     
-                                      content={() => {                                                        
-                                        return updateAskPrice(id);
-                                      }}
-                                    >
-                                      <Button style={{ borderRadius: 2, border: "1px solid black", backgroundColor: "white", color: "#3e190f", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">UPDATE</Button>
-                                    </Popover>
                                     <Popover
                                       content={() => {                                                        
                                         return cancelAsk(id);
@@ -796,6 +1044,8 @@ function OldEnglish({
                                 </div> 
                                 ) : ( // listing active  &  marketplace protocols approved  &  app user is not owner
                                 <div className="approvals_and_functions_wrapper">
+{/* 
+    taking out approvals button
                                   <Button
                                     className="marketplaceApprovalButton"
                                     disabled={true}
@@ -804,9 +1054,10 @@ function OldEnglish({
                                   >
                                     MARKETPLACE PROTOCOLS ARE APPROVED
                                   </Button>        
+
+                                   */}
                                   <div className="marketplaceManager">
                                     <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">LIST</Button>
-                                    <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">UPDATE</Button>
                                     <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">CANCEL</Button>                                    
                                     <Popover
                                       className="fillAskPopver"

@@ -191,18 +191,18 @@ function OldEnglish({
 
    const fillOrder = async () => {
 
-      const CHAIN_ID = 3; //3 = ropsten
+      const CHAIN_ID = 3; // 3 = ropsten, 10 = optimism
 
       console.log ("fillOrder function running");
 
       const lostandfound_token_0 = {
-         tokenAddress: '0xd373B9C8acc3439d42359bDAd3a0e3cC4BD0Ff66', //ropsten deployment
+         tokenAddress: '0xd373B9C8acc3439d42359bDAd3a0e3cC4BD0Ff66', //ropsten nft contract deployment
          tokenId: '0', //this should be angel
          type: 'ERC721'
       }
 
       const price_to_list_for = {
-         tokenAddress: ETH_ADDRESS_AS_ERC20, //nulladdress so that lister gets paid in eth
+         tokenAddress: ETH_ADDRESS_AS_ERC20, 
          amount: "10000000000000000", //16 zeroes aka 0.01eth
          type: 'ERC20'
       }      
@@ -245,21 +245,14 @@ function OldEnglish({
       ]
 
       const nullSignatureStruct = {
+
+         // These value indicates that the order maker has previously marked the order as fillable on-chain. The remaining fields in the Signature struct will be ignored.
+         // link to where this explanation comes from: https://docs.0x.org/protocol/docs/signatures         
          "r": "0x0000000000000000000000000000000000000000000000000000000000000000",
          "s": "0x0000000000000000000000000000000000000000000000000000000000000000",
          "v": 0,
          "signatureType": 4
       }
-      
-      
-/*       [
-         4,
-         0,
-         '0',
-         '0'
-          // This value indicates that the order maker has previously marked the order as fillable on-chain. The remaining fields in the Signature struct will be ignored.
-         // link to where this explanation comes from: https://docs.0x.org/protocol/docs/signatures
-      ] */
 
       const fillTx = await nftSwapSdk.exchangeProxy.buyERC721(
          reconstructedOnchainOrder,
@@ -269,7 +262,7 @@ function OldEnglish({
       );
 
       const fillTxReceipt = await nftSwapSdk.awaitTransactionHash(fillTx);
-/*       console.log('Filled order! 🎉', fillTxReceipt.transactionHash);  */
+      console.log('Filled order! 🎉', fillTxReceipt.transactionHash); 
    
    }
 

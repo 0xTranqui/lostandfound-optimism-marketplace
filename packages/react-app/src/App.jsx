@@ -324,6 +324,7 @@ function App(props) {
               address={address}
               DEBUG={DEBUG}
               oldEnglishContract={oldEnglishContract}
+              userSigner={userSigner}
               zoraTransferHelperContract={zoraTransferHelperContract}
               zmmContract={zmmContract}
               zoraAsksContract={zoraAsksContract}
