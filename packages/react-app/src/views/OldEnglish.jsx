@@ -10,7 +10,11 @@ import LF_Logo_V2_5 from "./LF_Logo_V2_5.png";
 import LF_Logo_Blueprint from "./LF_Logo_Blueprint_0x.png";
 
 import { NftSwapV4, ETH_ADDRESS_AS_ERC20 } from '@traderxyz/nft-swap-sdk';
+import { createClient } from 'urql';
+
 //========== MY CUSTOM IMPORTS
+
+const APIURL = 'https://api.thegraph.com/subgraphs/name/mzhu25/presigned-v4-nft-orders';
 
 function OldEnglish({
   readContracts,
@@ -83,7 +87,7 @@ function OldEnglish({
         const nftMetadataObject = await nftMetadataFetch.json();
         const collectibleUpdate = {};
 
-        console.log(nftMetadataObject);
+     /*    console.log(nftMetadataObject); */
 
         //===== CUSTOM UPDATE, added askSeller: seller and nftOwner: ownerAddress as key:value pairs
         collectibleUpdate[id] = { id: id, uri: tokenURI, askSeller: seller, nftOwner: ownerAddressCleaned, ...nftMetadataObject};
@@ -322,7 +326,7 @@ function OldEnglish({
   };  
 
   //========== ZORA CANCEL ASK FLOW ==========
-  const [cancelAskForm] = Form.useForm();
+/*   const [cancelAskForm] = Form.useForm();
   const cancelAsk = id => {
     const [cancel, setCancel] = useState(false);
 
@@ -365,7 +369,7 @@ function OldEnglish({
         </Form>
       </div>
     );
-  };  
+  };   */
 
   //========== ZORA FILL ASK FLOW ==========
   const [fillAskForm] = Form.useForm();
@@ -648,7 +652,82 @@ function OldEnglish({
   }   */
 
    //========== 0x Protocol Cancel Order Flow ==========  
-  const cancelOrder = async () => {
+  const [cancelOrderForm] = Form.useForm();
+  const cancelOrder = id => {
+    const [cancel, setCancel] = useState(false);
+
+    const CHAIN_ID = userSigner.provider._network && userSigner.provider._network.chainId; // 3 = ropsten, 10 = optimism
+
+    const nftSwapSdk = new NftSwapV4(localProvider, userSigner, CHAIN_ID);
+
+    const tokensQuery = `
+    query {
+      erc721Orders(
+        orderBy: nonce
+        where: {erc721Token: "${lostandfoundNFTContractAddress}", erc721TokenId: "${id}" }
+      ) {
+        id
+        direction
+        maker
+        taker
+        expiry
+        nonce
+        erc20Token
+        erc20TokenAmount
+        fees {
+          id
+        }
+        erc721Token
+        erc721TokenId
+        erc721TokenProperties {
+          id
+        }
+      }
+    }
+  `
+  
+  const client = createClient({
+    url: APIURL
+  })
+
+    return (
+      <div>
+        <Form
+          className=""
+          form={cancelOrderForm}
+          name="cancel order"
+          onFinish={async values => {
+            setCancel(true);
+            const subgraphQuery =  await client.query(tokensQuery).toPromise();
+            const orderNonceToCancel = subgraphQuery.data.erc721Orders[0].nonce;
+            console.log("Order Nonce Being Cancelled: ", orderNonceToCancel);
+            try {
+              const txCur = await tx(nftSwapSdk.exchangeProxy.cancelERC721Order(orderNonceToCancel))
+              await txCur.wait();
+              setCancel(false);
+            } catch (e) {
+              console.log("CANCEL ORDER FAILED", e);
+              setCancel(false);
+            }
+          }}
+          onFinishedFailed={onFinishFailed}
+        >
+          <Form.Item>
+            <Button
+            style={{ backgroundColor: "#e26843", color: "#791600", border: "4px solid #791600", fontSize: "1.25rem", height: "auto", borderRadius: 20  }} 
+            type="primary"
+            htmlType="submit"
+            loading={cancel}
+            >
+            CANCEL
+            </Button>
+          </Form.Item>
+        </Form>
+      </div>
+    )
+  }
+  
+/*   const cancelOrder = async () => {
       
     const CHAIN_ID = 3; //3 = ropsten
 
@@ -658,7 +737,7 @@ function OldEnglish({
 
     const cancelOrder = await nftSwapSdk.exchangeProxy.cancelERC721Order(orderNonce); 
 
-  }
+  } */
 
     //=======0x Protocol Fill Order Flow===========
 
@@ -906,8 +985,19 @@ function OldEnglish({
                                   type="primary">
                                   LIST
                                 </Button>
-                              </Popover>                                                                                                   
-                              <Button disabled={false} onClick={cancelOrder} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">CANCEL</Button>
+                              </Popover>
+                              <Popover
+                                placement="top"
+                                  content={() => {                                                        
+                                    return cancelOrder(id);
+                                  }}
+                                >
+                                <Button
+                                  style={{ borderRadius: 2, border: "1px solid black", backgroundColor: "white", color: "#3e190f", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }}
+                                  type="primary">
+                                  CANCEL
+                                </Button>
+                              </Popover>                                                                                                                                                              
                               <Button disabled={false} onClick={fillOrder} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">BUY</Button>
                             </div>                             
                           </div>
@@ -929,10 +1019,10 @@ function OldEnglish({
  */}
                                   <div className="marketplaceManager">
                                   <Popover
-                                    placement="top"
+/*                                     placement="top"
                                       content={() => {                                                        
                                         return createAsk(id);
-                                      }}
+                                      }} */
                                     >
                                       <Button style={{ borderRadius: 2, border: "1px solid black", backgroundColor: "white", color: "#3e190f", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">LIST</Button>
                                     </Popover>
@@ -1032,13 +1122,13 @@ function OldEnglish({
  */}
                                   <div className="marketplaceManager">                             
                                     <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">LIST</Button>                                
-                                    <Popover
+{/*                                     <Popover
                                       content={() => {                                                        
                                         return cancelAsk(id);
                                       }}
                                     >
                                       <Button style={{ borderRadius: 2, border: "1px solid black", backgroundColor: "white", color: "#3e190f", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">CANCEL</Button>
-                                    </Popover>
+                                    </Popover> */}
                                     <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">BUY</Button>
                                   </div>  
                                 </div> 
