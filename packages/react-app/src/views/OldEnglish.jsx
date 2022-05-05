@@ -526,7 +526,7 @@ function OldEnglish({
     const nftSwapSdk = new NftSwapV4(localProvider, userSigner, CHAIN_ID);
 
     const specificNftId = {
-      tokenAddress: lostandfoundNFTContractAddress, //ropsten deployment
+      tokenAddress: lostandfoundNFTContractAddress, 
       tokenId: id,
       type: 'ERC721'
     }
@@ -558,18 +558,13 @@ function OldEnglish({
                 nftToSwapUserA,
                 walletAddressUserA
                 ));
-              const approvalTxReceipt = await txCur.wait();
-          /*          console.log(
-              `Approved ${assetsToSwapUserA[0].tokenAddress} contract to swap with 0x v4 (txHash: ${approvalTxReceipt.transactionHash})`
-              ); */
-              }   
-
-              console.log("starting order build...")
+              }
+              
               const order = nftSwapSdk.buildOrder(
                 nftToSwapUserA,
                 {
                   tokenAddress: ETH_ADDRESS_AS_ERC20,
-                  amount: ethers.utils.parseUnits(values["listingPrice"], 'ether').toString(), // THIS IS THE ONLY VALUE GETTING UPDATED IN FORM
+                  amount: ethers.utils.parseUnits(values["listingPrice"], 'ether').toString(),
                   type: 'ERC20'
                 },
                 walletAddressUserA
@@ -613,45 +608,6 @@ function OldEnglish({
     )
   }
 
-
-
-
-
-
-
-
- // Check if we need to approve the NFT for swapping
-/*     const approvalStatusForUserA = await nftSwapSdk.loadApprovalStatus(
-      nftToSwapUserA,
-      walletAddressUserA
-    );
-
-    // If we do need to approve User A's NFT for swapping, let's do that now
-    if (!approvalStatusForUserA.contractApproved) {
-      const approvalTx = await nftSwapSdk.approveTokenOrNftByAsset(
-      nftToSwapUserA,
-      walletAddressUserA
-      );
-    const approvalTxReceipt = await approvalTx.wait(); */
-/*          console.log(
-    `Approved ${assetsToSwapUserA[0].tokenAddress} contract to swap with 0x v4 (txHash: ${approvalTxReceipt.transactionHash})`
-    ); */
-/*     }   
-
-    // Create the order (Remember, User A initiates the trade, so User A creates the order)
-    const order = nftSwapSdk.buildOrder(
-      nftToSwapUserA,
-      ethToSwapUserB,
-      walletAddressUserA
-    );
-
-    // Sign the order (User A signs since they are initiating the trade)
-    console.log("onchainOrder getting made: ")
-    const onchainOrder = await nftSwapSdk.exchangeProxy.preSignERC721Order(order); 
-    console.log("onchainOrder finished!")
-
-  }   */
-
    //========== 0x Protocol Cancel Order Flow ==========  
   const [cancelOrderForm] = Form.useForm();
   const cancelOrder = id => {
@@ -665,7 +621,7 @@ function OldEnglish({
     query {
       erc721Orders(
         where: {erc721Token: "${lostandfoundNFTContractAddress}", erc721TokenId: "${id}" }
-        orderBy: nonce
+        orderBy: erc20TokenAmount
         orderDirection: desc
       ) {
         id
@@ -688,12 +644,12 @@ function OldEnglish({
     }
   `
 
-  /* const caporder = [0, "0x806164c929ad3a6f4bd70c2370b3ef36c64deaa8", "0x0000000000000000000000000000000000000000", "2524604400", "100131415900000000000000000000000000000335459530157037663109949482927682142993", "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", "250000000000000000", [], "0x9fd7ad2ecf7510eddcf0e6a345188d9df23805ac", "2", []] */
-  
   const client = createClient({
     url: APIURL
-  })
+  })  
 
+  /* const caporder = [0, "0x806164c929ad3a6f4bd70c2370b3ef36c64deaa8", "0x0000000000000000000000000000000000000000", "2524604400", "100131415900000000000000000000000000000335459530157037663109949482927682142993", "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", "250000000000000000", [], "0x9fd7ad2ecf7510eddcf0e6a345188d9df23805ac", "2", []] */
+  
     return (
       <div>
         <Form
@@ -705,15 +661,9 @@ function OldEnglish({
             const subgraphQuery =  await client.query(tokensQuery).toPromise();
             const orderNonceToCancel = subgraphQuery.data.erc721Orders[0].nonce;
             console.log("Order Nonce Being Cancelled: ", orderNonceToCancel);
-            console.log("entire order being indexed: ", subgraphQuery.data.erc721Orders[0])
-            console.log("0x contract: ", zeroExErc721StatusContract)
-            console.log("zora", zoraAsksContract); //cancelERC721Order
-            console.log("nftswapexchangeproxy", nftSwapSdk.exchangeProxy)
             try {
-//tx(writeContracts[zeroExErc721StatusContract].cancelERC721Order(orderNonceToCancel))
-//nftSwapSdk.exchangeProxy.cancelERC721Order(orderNonceToCancel));
-
               const txCur = await tx(writeContracts[zeroExErc721StatusContract].cancelERC721Order(orderNonceToCancel));
+              /* const txCur = await tx(nftSwapSdk.exchangeproxy.cancelERC721Order(orderNonceToCancel)); original call to make following sdk, doesn't work tho    */      
               await txCur.wait();
               setCancel(false);
             } catch (e) {
@@ -738,40 +688,62 @@ function OldEnglish({
     )
   }
   
-/*   const cancelOrder = async () => {
-      
-    const CHAIN_ID = 3; //3 = ropsten
+    //========== 0x Protocol Fill Order Flow ==========
 
-    const nftSwapSdk = new NftSwapV4(localProvider, userSigner, CHAIN_ID);
-
-    const orderNonce = "100131415900000000000000000000000000000160812848772371044860429851089384113904";
-
-    const cancelOrder = await nftSwapSdk.exchangeProxy.cancelERC721Order(orderNonce); 
-
-  } */
-
-    //=======0x Protocol Fill Order Flow===========
-
-    const fillOrder = async () => {
+    const fillOrder = async (id) => {
 
       const CHAIN_ID = 3; // 3 = ropsten, 10 = optimism
 
       console.log ("fillOrder function running");
 
-      const lostandfound_token_0 = {
-        tokenAddress: '0xd373B9C8acc3439d42359bDAd3a0e3cC4BD0Ff66', //ropsten nft contract deployment
-        tokenId: '0', //this should be angel
+      const lostandfoundSpecificNFT = {
+        tokenAddress: lostandfoundNFTContractAddress, 
+        tokenId: id,
         type: 'ERC721'
       }
 
-      const price_to_list_for = {
+      const tokensQuery = `
+      query {
+        erc721Orders(
+          where: {erc721Token: "${lostandfoundNFTContractAddress}", erc721TokenId: "${id}" }
+          orderBy: erc20TokenAmount
+          orderDirection: desc
+        ) {
+          id
+          direction
+          maker
+          taker
+          expiry
+          nonce
+          erc20Token
+          erc20TokenAmount
+          fees {
+            id
+          }
+          erc721Token
+          erc721TokenId
+          erc721TokenProperties {
+            id
+          }
+        }
+      }
+    `
+  
+    const client = createClient({
+      url: APIURL
+    })
+    
+    const subgraphQuery =  await client.query(tokensQuery).toPromise();
+    const erc20TokenAmount = subgraphQuery.data.erc721Orders[0].erc20TokenAmount // applies whether recieving native eth or erc20 
+
+      const purchasePrice = {
         tokenAddress: ETH_ADDRESS_AS_ERC20, 
-        amount: "10000000000000000", //16 zeroes aka 0.01eth
+        amount: erc20TokenAmount,
         type: 'ERC20'
       }      
 
-      const walletAddressUserB = '0x153D2A196dc8f1F6b9Aa87241864B3e4d4FEc170'
-      const ethToSwapUserB = price_to_list_for;
+      const walletAddressUserB = address;
+      const ethToSwapUserB = purchasePrice;
 
       const nftSwapSdk = new NftSwapV4(localProvider, userSigner, CHAIN_ID);
 
@@ -782,28 +754,23 @@ function OldEnglish({
       );      
 
       if (!approvalStatusForUserB.contractApproved) {
-        const approvalTx = await nftSwapSdk.approveTokenOrNftByAsset(
+        const approvalTx = await tx(nftSwapSdk.approveTokenOrNftByAsset(
         ethToSwapUserB,
         walletAddressUserB
-        );
-        const approvalTxReceipt = await approvalTx.wait();
-/*          console.log(
-        `Approved ${assetsToSwapUserA[0].tokenAddress} contract to swap with 0x v4 (txHash: ${approvalTxReceipt.transactionHash})`
-        ); */
+        ));
       }   
 
       const reconstructedOnchainOrder = [
-        0, // trade direction (0 = sell, 1 = buy)
-        "0x806164c929Ad3A6f4bd70c2370b3Ef36c64dEaa8", // maker address
-        "0x0000000000000000000000000000000000000000", // taker address 
-        "2524604400", // expiry from creation of original order?
-        "100131415900000000000000000000000000000160812848772371044860429851089384113904",
-        // nonce
-        ETH_ADDRESS_AS_ERC20, // erc20token
-        "10000000000000000", // erc20 token amount (hardhcoded to 0.01 eth)
+        subgraphQuery.data.erc721Orders[0].direction, // trade direction (0 = sell, 1 = buy)
+        subgraphQuery.data.erc721Orders[0].maker, // maker address
+        subgraphQuery.data.erc721Orders[0].taker, // taker address 
+        subgraphQuery.data.erc721Orders[0].expiry, // expiry from creation of original order?
+        subgraphQuery.data.erc721Orders[0].nonce, // nonce
+        subgraphQuery.data.erc721Orders[0].erc20Token, // erc20token
+        subgraphQuery.data.erc721Orders[0].erc20TokenAmount, // erc20 token amount (hardhcoded to 0.01 eth)
         [], // fees (none included atm)
-        "0xd373b9c8acc3439d42359bdad3a0e3cc4bd0ff66", // erc721 nft contract
-        "2", // erc721 nft contract token id
+        subgraphQuery.data.erc721Orders[0].erc721Token, // erc721 nft contract
+        subgraphQuery.data.erc721Orders[0].erc721tokenId, // erc721 nft contract token id
         [] // erc721 token properties (none included atm)
       ]
 
@@ -816,15 +783,13 @@ function OldEnglish({
         "signatureType": 4
       }
 
-      const fillTx = await nftSwapSdk.exchangeProxy.buyERC721(
+      const fillTx = await tx(nftSwapSdk.exchangeProxy.buyERC721(
         reconstructedOnchainOrder,
         nullSignatureStruct,
-        "0x", // taker address
-        { value: BigNumber.from("10000000000000000").toString() }
-      );
+        "0x", // null taker address passed into callback data param
+        { value: BigNumber.from(subgraphQuery.data.erc721Orders[0].erc20TokenAmount).toString() }
+      ));
 
-      const fillTxReceipt = await nftSwapSdk.awaitTransactionHash(fillTx);
-      console.log('Filled order! 🎉', fillTxReceipt.transactionHash); 
     }
 
   return (
@@ -965,7 +930,9 @@ function OldEnglish({
                           { erc721TransferHelperApproved == false || zoraModuleManagerApproved == false ? ( // listing inactive  &  marketplace protocols not approved
                           <div className="approvals_and_functions_wrapper">
 {/* 
+  
   taking out approval button
+
                             <Popover
                               className="popoverMaster"
                               placement="top"
