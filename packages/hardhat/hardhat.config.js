@@ -26,7 +26,7 @@ const { isAddress, getAddress, formatUnits, parseUnits } = utils;
 //
 // Select the network you want to deploy to here:
 //
-const defaultNetwork = "ropsten";
+const defaultNetwork = "optimism";
 
 const mainnetGwei = 60;
 
@@ -85,10 +85,10 @@ module.exports = {
       url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.MAINNET_ALCHEMY_KEY}`,
       accounts: [`${process.env.MAINNET_DEPLOYER_PRIV_KEY}`],
     }, */
-    ropsten: {
+/*     ropsten: {
       url: `https://eth-ropsten.alchemyapi.io/v2/${process.env.RINKEBY_ALCHEMY_KEY}`,
       accounts: [`${process.env.ROPSTEN_DEPLOYER_PRIV_KEY}`],
-    },
+    }, */
     // goerli: {
     //   url: `https://goerli.infura.io/v3/${process.env.GOERLI_INFURA_KEY}`,
     //   accounts: [`${process.env.GOERLI_DEPLOYER_PRIV_KEY}`],
@@ -99,13 +99,8 @@ module.exports = {
     //   accounts: [`${process.env.XDAI_DEPLOYER_PRIV_KEY}`],
     // },
     optimism: {
-      url: "https://mainnet.optimism.io",
-      accounts: {
-        mnemonic: mnemonic(),
-      },
-      companionNetworks: {
-        l1: "mainnet",
-      },
+      url: `https://opt-mainnet.g.alchemy.com/v2/${process.env.OPTIMISM_ALCHEMY_KEY}`,
+      accounts: [`${process.env.OPTIMISM_DEPLOYER_PRIV_KEY}`],
     },
 /*     rinkeby: {
       url: `https://rinkeby.infura.io/v3/${process.env.RINKEBY_INFURA_KEY}`, // <---- YOUR INFURA ID! (or it won't work)
@@ -321,7 +316,7 @@ module.exports = {
     },
   },
   etherscan: {
-    apiKey: process.env.RINKEBY_ETHERSCAN_API_KEY,
+    apiKey: process.env.ROPSTEN_ETHERSCAN_API_KEY
   },
 };
 

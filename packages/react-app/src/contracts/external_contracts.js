@@ -6134,6 +6134,10 @@ module.exports = {
                 address: "0x0C58C1170f1DEd633862A1166f52107490a9C594",
                 abi: ZEROEXERC721ORDERSFEATUREABI,
             },
+            lostandFoundOptimism: {
+                address: "0xa4248aC1a4Fc557134802f39cddF830Fde6DdA06",
+                abi: LOSTANDFOUNDCONTRACT4ABI,
+            }                  
         }        
     },  
 };

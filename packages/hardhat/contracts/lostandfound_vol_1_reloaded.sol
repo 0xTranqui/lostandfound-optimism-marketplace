@@ -88,7 +88,7 @@ contract lostandfound_vol_1_reloaded is ERC721, IERC2981, ReentrancyGuard, Ownab
    // ========== URI FUNCTIONALITY ==========
 
    string private customContractURI =
-      "ipfs://bafybeigiucyvtnm25hnfrio5yg7gl6hmlrksvpww65hho6vsrziq54z6fq";
+      "ipfs:///bafybeigvd2omjwbdn5nw4sf3xsvyzafl3ebwcwtd6zjagdiwa45ozwhhhe";
 
    function setContractURI(string memory customContractURI_) external onlyOwner {
       customContractURI = customContractURI_;

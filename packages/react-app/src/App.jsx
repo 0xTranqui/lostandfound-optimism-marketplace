@@ -56,7 +56,7 @@ const { ethers } = require("ethers");
 const DEBUG = true;
 const NETWORKCHECK = true;
 
-const targetNetworkString = "ropsten" // <------ change this as you deploy do other networks
+const targetNetworkString = "optimism" // <------ change this as you deploy do other networks
 
 const web3Modal = Web3ModalSetup();
 
@@ -74,8 +74,8 @@ function App(props) {
   const zoraTransferHelperContract = "zoraTransferHelperROPSTEN"; //change this in external_contracts.js to convert to rinkeby/mainnet
   const zmmContract = "zoraModuleManagerROPSTEN"; //change this in external_contracts.js to convert to rinkeby/mainnet
   const zoraAsksContract = "zoraAsksV1_1ModuleROPSTEN"; //change this in external_contracts.js to convert to rinkeby/mainnet
-  const lostandfoundNFTContract = "lostandFoundContract4"; // update address of lostandFoundContract2 if redeploying an identical nft contract for testing purposes
-  const lostandfoundNFTContractAddress = "0x9Fd7ad2ECF7510EddCf0e6a345188d9dF23805ac"; // change this to the nft contract you want to be interacting with
+  const lostandfoundNFTContract = "lostandFoundOptimism"; // update address of lostandFoundContract2 if redeploying an identical nft contract for testing purposes
+  const lostandfoundNFTContractAddress = "0xa4248aC1a4Fc557134802f39cddF830Fde6DdA06"; // change this to the nft contract you want to be interacting with
   
   const zeroExErc721StatusContract = "zeroExErc721OrdersFeatureROPSTEN";
   //======my custom additions
