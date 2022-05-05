@@ -77,7 +77,7 @@ function App(props) {
   const lostandfoundNFTContract = "lostandFoundOptimism"; // update address of lostandFoundContract2 if redeploying an identical nft contract for testing purposes
   const lostandfoundNFTContractAddress = "0xa4248aC1a4Fc557134802f39cddF830Fde6DdA06"; // change this to the nft contract you want to be interacting with
   
-  const zeroExErc721StatusContract = "zeroExErc721OrdersFeatureROPSTEN";
+  const zeroExErc721StatusContract = "zeroExErc721StatusOPTIMISM";
   //======my custom additions
 
   // specify all the chains your app is available on. Eg: ['localhost', 'mainnet', ...otherNetworks ]

@@ -14,7 +14,7 @@ import { createClient } from 'urql';
 
 //========== MY CUSTOM IMPORTS
 
-const APIURL = 'https://api.thegraph.com/subgraphs/name/mzhu25/presigned-v4-nft-orders';
+const APIURL = 'https://api.thegraph.com/subgraphs/name/0xtranqui/optimism0xsubgraph2';
 
 function OldEnglish({
   readContracts,
@@ -77,8 +77,81 @@ function OldEnglish({
       //===== CUSTOM UPDATE
       const seller = {seller: '0x0000000000000000000000000000000000000000', sellerFundsRecipient: '0x0000000000000000000000000000000000000000', askCurrency: '0x0000000000000000000000000000000000000000', findersFeeBps: 0, askPrice: BigNumber} ;
 
-      //^ this sets all asks to be inactive. line below is the actual zora querying code
-      /* readContracts[zoraAsksContract].askForNFT(lostandfoundNFTContractAddress, id); */
+      const tokensQuery = `
+      query {
+        erc721Orders(
+          where: {erc721Token: "${lostandfoundNFTContractAddress}", erc721TokenId: "${id}" }
+          orderBy: erc20TokenAmount
+          orderDirection: asc
+        ) {
+          id
+          direction
+          maker
+          taker
+          expiry
+          nonce
+          erc20Token
+          erc20TokenAmount
+          fees {
+            id
+          }
+          erc721Token
+          erc721TokenId
+          erc721TokenProperties {
+            id
+          }
+        }
+      }
+    `      
+
+    const client = createClient({
+      url: APIURL
+    })  
+
+    const subgraphQuery =  await client.query(tokensQuery).toPromise();
+    console.log("subgraph query", subgraphQuery);
+
+    const orderToCheck = subgraphQuery.data.erc721Orders.length;
+    console.log("order to check", orderToCheck); 
+
+    if ( orderToCheck > 0) {
+      const localZeroExOrderStatus = [
+        subgraphQuery.data.erc721Orders[0].direction, // trade direction (0 = sell, 1 = buy)
+        subgraphQuery.data.erc721Orders[0].maker, // maker address
+        subgraphQuery.data.erc721Orders[0].taker, // taker address 
+        subgraphQuery.data.erc721Orders[0].expiry, // expiry from creation of original order?
+        subgraphQuery.data.erc721Orders[0].nonce, // nonce
+        subgraphQuery.data.erc721Orders[0].erc20Token, // erc20token
+        BigNumber.from(subgraphQuery.data.erc721Orders[0].erc20TokenAmount).toString(), // erc20 token amount (hardhcoded to 0.01 eth)
+        [], // fees (none included atm)
+        subgraphQuery.data.erc721Orders[0].erc721Token, // erc721 nft contract
+        subgraphQuery.data.erc721Orders[0].erc721tokenId, // erc721 nft contract token id
+        [] // erc721 token properties (none included atm)
+      ]   
+    } else {
+      const localZeroExOrderStatus = [
+        5, // trade direction (0 = sell, 1 = buy, 5 = no order (hardcoded locally)
+        0, // maker address
+        0, // taker address 
+        0, // expiry from creation of original order?
+        0, // nonce
+        0, // erc20token
+        0, // erc20 token amount (hardhcoded to 0.01 eth)
+        0, // fees (none included atm)
+        0, // erc721 nft contract
+        0, // erc721 nft contract token id
+        0 // erc721 token properties (none included atm)
+      ]
+    }
+
+
+    if (localZeroExOrderStatus[0] == 5 ) {
+      const zeroExOrderStatus = localZeroExOrderStatus
+    } else {
+      const zeroExOrderStatus = readContracts[zeroExErc721StatusContract].getERC721OrderStatus(
+        localZeroExOrderStatus
+      )
+    }
 
       const ownerAddress = await readContracts[lostandfoundNFTContract].ownerOf(id);
       const ownerAddressCleaned = ownerAddress.toString().toLowerCase();
@@ -91,7 +164,9 @@ function OldEnglish({
      /*    console.log(nftMetadataObject); */
 
         //===== CUSTOM UPDATE, added askSeller: seller and nftOwner: ownerAddress as key:value pairs
-        collectibleUpdate[id] = { id: id, uri: tokenURI, askSeller: seller, nftOwner: ownerAddressCleaned, ...nftMetadataObject};
+        collectibleUpdate[id] = { id: id, uri: tokenURI, orderStatus: zeroExOrderStatus, askSeller: seller, nftOwner: ownerAddressCleaned, ...nftMetadataObject};
+        console.log("collectible update", collectibleUpdate);
+        console.log("order status ", orderStatus)
         //====== CUSTOM UPDATE
 
         setAllOldEnglish(i => ({ ...i, ...collectibleUpdate }));
@@ -156,364 +231,6 @@ function OldEnglish({
     filteredOEs = filteredOEs.filter(function (el) {
       return el.nftOwner == address.toLowerCase();
     });
-  }
-
-/*   //========== ZORA CREATE ASK FLOW ==========
-  const [createAskForm] = Form.useForm();
-  const createAsk = id => {
-    const [listing, setListing] = useState(false);
-
-    return (
-      <div >
-        <Form
-          layout={"horizontal"}
-          form={createAskForm}
-          name="create ask"
-          initialValues={{ 
-            tokenId: id,
-            askPrice: '',
-            sellerFundsRecipient: '',
-            findersFeeBps: '',
-          }}
-          onFinish={async values => {
-            setListing(true);
-            try {
-              const txCur = await tx(writeContracts[zoraAsksContract].createAsk(
-                lostandfoundNFTContractAddress,
-                id,
-                ethers.utils.parseUnits(values["askPrice"], 'ether'), 
-                "0x0000000000000000000000000000000000000000",
-                values["sellerFundsRecipient"],
-                (Number(values["findersFeeBps"]).toFixed(2)) * 100 // converts inputted % into a whole number of basis points between 0 - 10000
-              ));
-              await txCur.wait();
-              updateOneOldEnglish(id);
-              setListing(false);
-            } catch (e) {
-              console.log("create ask failed", e);
-              setListing(false);
-            }
-          }}
-          onFinishFailed={onFinishFailed}
-        >
-          <Form.Item
-            style={{marginTop: 0, marignBottom: 0, paddingTop: 0, paddingBottom: 0}}              
-            name="askPrice"
-            label="LIST PRICE "
-            rules={[
-              {
-                required: true,
-                message: "HOW MUCH ARE YOU LISTING THIS NFT FOR?",
-              },
-            ]}
-          >
-            <Input
-            addonAfter={"ETH"}
-            />
-          </Form.Item>         
-          <Form.Item
-            style={{marginTop: 0, marignBottom: 0, paddingTop: 0, paddingBottom: 0}}
-            name="sellerFundsRecipient"
-            label="SELLER FUNDS RECIPIENT"
-            rules={[
-              {
-                required: true,
-                message: "WHO GETS THE FUNDS FROM THIS SALE?",
-              },
-            ]}
-          >
-            <Input
-            placeholder={"FULL WALLET ADDRESS (NO .ETH NAMES)"}
-            />
-          </Form.Item>
-          <Form.Item
-            style={{marginTop: 0, marignBottom: 0, paddingTop: 0, paddingBottom: 0}}
-            name="findersFeeBps"
-            rules={[
-              {
-                required: true,
-                message: "INPUT REQUIRED IF 'FINDER'S FEE IS SELECTED'",
-              },
-            ]}
-          >
-            <div>
-              <Radio.Group>
-                <Radio onClick={createHandleClickFalse} value={""}>ADD FINDER'S FEE</Radio>                
-                <Radio onClick={createHandleClickTrue} value={"0x0000000000000000000000000000000000000000"}>NO FINDER'S FEE</Radio>
-              </Radio.Group>
-              <Input            
-              style={{ marginTop: "5px", width: "50%" }}
-              addonAfter={"%"}
-              disabled={createFinderIsDisabled}
-              />
-            </div>
-          </Form.Item>          
-          <Form.Item>
-            <Button
-            style={{ backgroundColor: "#425688", color: "#f7f8f9", border: "4px solid #203466", fontSize: "1.25rem", height: "auto", borderRadius: 20  }} 
-            type="primary"
-            htmlType="submit"
-            loading={listing}>
-              LIST
-            </Button>
-          </Form.Item>
-        </Form>
-      </div>
-    );
-  };   */
-
-  //========== ZORA UPDATE ASK FLOW ==========
-  const [setAskForm] = Form.useForm();
-  const updateAskPrice = id => {
-    const [set, setSet] = useState(false);
-
-    return (
-      <div>
-        <Form
-          className="updateAskFormPopoverManager"
-          form={setAskForm}
-          name="update ask price"
-          initialValues={{ 
-            tokenId: id,
-            updatedPrice: '',
-          }}
-          onFinish={async values => {
-            setSet(true);
-            try {
-              const txCur = await tx(writeContracts[zoraAsksContract].setAskPrice(
-                lostandfoundNFTContractAddress,
-                id,
-                ethers.utils.parseUnits(values["updatedPrice"], 'ether'), 
-                "0x0000000000000000000000000000000000000000"
-              ));
-              await txCur.wait();
-              updateOneOldEnglish(id);
-              setSet(false);
-            } catch (e) {
-              console.log("UPDATE LISTING PRICE FAILED", e);
-              setSet(false);
-            }
-          }}
-          onFinishFailed={onFinishFailed}
-        >
-          <Form.Item
-            name="updatedPrice"
-            rules={[
-              {
-                required: true,
-                message: "WHAT IS THE UPDATED LISTING PRICE?",
-              },
-            ]}
-          >
-            <Input
-            style={{width: "300px"}}
-            placeholder={"UPDATED LISTING PRICE"}
-            addonAfter={"ETH"}
-            />
-          </Form.Item>                
-          <Form.Item>
-            <Button
-            style={{ backgroundColor: "#579dfa", color: "#283cc4", border: "4px solid #283cc4", fontSize: "1.25rem", height: "auto", borderRadius: 20  }} 
-            type="primary"
-            htmlType="submit"
-            loading={set}
-            >
-              UPDATE
-            </Button>
-          </Form.Item>
-        </Form>
-      </div>
-    );
-  };  
-
-  //========== ZORA CANCEL ASK FLOW ==========
-/*   const [cancelAskForm] = Form.useForm();
-  const cancelAsk = id => {
-    const [cancel, setCancel] = useState(false);
-
-    return (
-      <div>
-        <Form
-          className="cancelAskFormPopoverManager"
-          form={cancelAskForm}
-          name="cancel ask "
-          initialValues={{ 
-            tokenId: id,
-          }}
-          onFinish={async values => {
-            setCancel(true);
-            try {
-              const txCur = await tx(writeContracts[zoraAsksContract].cancelAsk(
-                lostandfoundNFTContractAddress,
-                id
-              ));
-              await txCur.wait();
-              updateOneOldEnglish(id);
-              setCancel(false);
-            } catch (e) {
-              console.log("CANCEL ASK FAILED", e);
-              setCancel(false);
-            }
-          }}
-          onFinishFailed={onFinishFailed}
-        >              
-          <Form.Item>
-            <Button
-            style={{ backgroundColor: "#e26843", color: "#791600", border: "4px solid #791600", fontSize: "1.25rem", height: "auto", borderRadius: 20  }} 
-            type="primary"
-            htmlType="submit"
-            loading={cancel}
-            >
-            CANCEL
-            </Button>
-          </Form.Item>
-        </Form>
-      </div>
-    );
-  };   */
-
-  //========== ZORA FILL ASK FLOW ==========
-  const [fillAskForm] = Form.useForm();
-  const fillAsk = id => {
-    const [fill, setFill] = useState(false);
-
-    return (
-      <div>
-        <Form
-          className="filllAskFormPopoverManager"      
-          form={fillAskForm}
-          name="fill ask "
-          initialValues={{ 
-            tokenId: id,
-            finderAddress: '',
-          }}
-          onFinish={async values => {
-            setFill(true);
-            try {
-              const txCur = await tx(writeContracts[zoraAsksContract].fillAsk(
-                lostandfoundNFTContractAddress,
-                id,
-                "0x0000000000000000000000000000000000000000", // 0 address for ETH sale               
-                BigNumber.from(allOldEnglish[id].askSeller.askPrice).toString(),
-                values['finderAddress'],
-                { value: BigNumber.from(allOldEnglish[id].askSeller.askPrice).toString() }
-              ));
-              await txCur.wait();
-              updateOneOldEnglish(id);
-              setFill(false);
-            } catch (e) {
-              console.log("FILL ASK FAILED", e);
-              setFill(false);
-            }
-          }}
-          onFinishFailed={onFinishFailed}
-        >                
-          <Form.Item
-            name="finderAddress"
-            rules={[
-              {
-                required: true,
-                message: "WHO FACILITATED THIS SALE?",
-              },
-            ]}
-          >
-            <div className="fillAskPopver">
-              <Radio.Group >
-                <Radio onClick={fillHandleClickFalse} value={""}>REWARD A FINDER</Radio>                
-                <Radio onClick={fillHandleClickTrue} value={"0x0000000000000000000000000000000000000000"}>NO FINDER INVOLVED</Radio>
-              </Radio.Group>
-              <Input
-                style={{ marginTop: "5px", width: "100%" }}
-                placeholder={"FINDER WALLET ADDRESS (NO .ETH NAMES)"}
-                disabled={fillFinderIsDisabled}
-              />
-            </div>
-          </Form.Item>        
-          <Form.Item>
-            <Button
-            style={{ backgroundColor: "#72a500", color: "#005a00", border: "4px solid #005a00", fontSize: "1.25rem", height: "auto", borderRadius: 20  }} 
-            type="primary"
-            htmlType="submit"
-            loading={fill}>
-              BUY
-            </Button>
-          </Form.Item>
-        </Form>
-      </div>
-    );
-  };
-
-  const marketplaceManager = () => {
-    const [transferHelper, setTransferHelper] = useState(false);
-    const [moduleManager, setModuleManager] = useState(false);
-
-    return (
-      <div className="approvalPopOverManager">
-        <div className="pleaseApprovePopover">
-          Lost & Found is built on the ZORA marketplace protocol. Please sign the following approvals to allow the protocol to interact with your assets : {/* ↓ ↓ */}
-        </div>
-        {erc721TransferHelperApproved == true ? (
-          <div
-            className="erc721ApprovedPopover"
-            style={{  }}>
-            NFT TRANSFER HELPER IS APPROVED ✅
-          </div>
-          ) : (
-          <Button
-          className="erc721ApprovalButtonPopover"   
-          style= {{ backgroundColor: "#d87456", color: "#791600", border: "4px solid #791600", fontSize: "1rem", height: "auto", borderRadius: 20  }}
-            type="primary"
-            loading={transferHelper}
-            onClick={async () => {
-              setTransferHelper(true);
-              try {
-                const txCur = await tx(writeContracts[lostandfoundNFTContract].setApprovalForAll(
-                  mainnetZoraAddresses.ERC721TransferHelper,
-                  true
-                ));
-                await txCur.wait();
-                updateOneOldEnglish();
-                setTransferHelper(false);
-              } catch (e) {
-                console.log("ERC721Transfer HelperApproval Failed", e);
-                setTransferHelper(false);
-              }
-            }}
-          >            
-            APPROVE NFT TRANSFER HELPER
-          </Button>
-          )}
-          {zoraModuleManagerApproved == true ? (
-          <div className="zmmApprovedPopover">
-            MARKETPLACE PROTOCOL IS APPROVED ✅ 
-          </div>              
-          ) : (
-          <Button
-            className="zmmApprovalButtonPopover"
-            style={{ backgroundColor: "#4998ff", color: "#283cc4", border: "4px solid #283cc4", fontSize: "1rem", height: "auto", borderRadius: 20, verticalAlign: "center" }}
-            type="primary"
-            loading={moduleManager}
-            onClick={async () => {
-              setModuleManager(true);
-              try {
-                const txCur = await tx(writeContracts[zmmContract].setApprovalForModule(
-                  mainnetZoraAddresses.AsksV1_1, 
-                  true
-                ));
-                await txCur.wait();
-                updateOneOldEnglish();
-                setModuleManager(false);
-              } catch (e) {
-                console.log("ZORA Module Manager Approval Failed", e);
-                setModuleManager(false);
-              }
-            }}
-          >      
-            APPROVE MARKETPLACE PROTOCOL
-          </Button>
-          )}
-      </div>
-    )
   }
 
   //========== 0x Protocol Create Order Flow ==========
@@ -648,7 +365,7 @@ function OldEnglish({
     url: APIURL
   })  
 
-  /* const caporder = [0, "0x806164c929ad3a6f4bd70c2370b3ef36c64deaa8", "0x0000000000000000000000000000000000000000", "2524604400", "100131415900000000000000000000000000000335459530157037663109949482927682142993", "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", "250000000000000000", [], "0x9fd7ad2ecf7510eddcf0e6a345188d9df23805ac", "2", []] */
+  /* const caporder = [0, "0x806164c929ad3a6f4bd70c2370b3ef36c64deaa8", "0x0000000000000000000000000000000000000000", "2524604400", "100131415900000000000000000000000000000276072267468760131049939705133557812592", "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", "999000000000000000000", [], "0xa4248ac1a4fc557134802f39cddf830fde6dda06", "1", []] */
   
     return (
       <div>
@@ -660,6 +377,7 @@ function OldEnglish({
             setCancel(true);
             const subgraphQuery =  await client.query(tokensQuery).toPromise();
             const orderNonceToCancel = subgraphQuery.data.erc721Orders[0].nonce;
+            console.log("entire query: ", subgraphQuery);
             console.log("Order Nonce Being Cancelled: ", orderNonceToCancel);
             try {
               const txCur = await tx(writeContracts[zeroExErc721StatusContract].cancelERC721Order(orderNonceToCancel));
@@ -690,24 +408,29 @@ function OldEnglish({
   
     //========== 0x Protocol Fill Order Flow ==========
 
-    const fillOrder = async (id) => {
+    const [fillOrderForm] = Form.useForm();
+    const fillOrder = id => {
+/*       const [fill, setFill] = useState(false); */
 
-      const CHAIN_ID = 3; // 3 = ropsten, 10 = optimism
-
-      console.log ("fillOrder function running");
+      const CHAIN_ID = userSigner.provider._network && userSigner.provider._network.chainId;
+      
+      const nftSwapSdk = new NftSwapV4(localProvider, userSigner, CHAIN_ID);
 
       const lostandfoundSpecificNFT = {
         tokenAddress: lostandfoundNFTContractAddress, 
         tokenId: id,
         type: 'ERC721'
-      }
+      }      
+      
+      const walletAddressUserB = address;
+      const nftToSwapUserB = lostandfoundSpecificNFT;  
 
       const tokensQuery = `
       query {
         erc721Orders(
           where: {erc721Token: "${lostandfoundNFTContractAddress}", erc721TokenId: "${id}" }
           orderBy: erc20TokenAmount
-          orderDirection: desc
+          orderDirection: asc
         ) {
           id
           direction
@@ -727,70 +450,184 @@ function OldEnglish({
           }
         }
       }
-    `
-  
+    `      
+
     const client = createClient({
       url: APIURL
-    })
+    })  
     
-    const subgraphQuery =  await client.query(tokensQuery).toPromise();
-    const erc20TokenAmount = subgraphQuery.data.erc721Orders[0].erc20TokenAmount // applies whether recieving native eth or erc20 
 
-      const purchasePrice = {
-        tokenAddress: ETH_ADDRESS_AS_ERC20, 
-        amount: erc20TokenAmount,
-        type: 'ERC20'
-      }      
+/*     const purchasePrice = {
+      tokenAddress: ETH_ADDRESS_AS_ERC20, 
+      amount: "1000000000000000",
+      type: 'ERC20'
+    }      
+   */
+ /* const caporder = [0, "0x806164c929ad3a6f4bd70c2370b3ef36c64deaa8", "0x0000000000000000000000000000000000000000", "2524604400", "100131415900000000000000000000000000000278871891236123933663926623449196810869", "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", "1000000000000000", [], "0xa4248ac1a4fc557134802f39cddf830fde6dda06", "1", []] */
 
-      const walletAddressUserB = address;
-      const ethToSwapUserB = purchasePrice;
+    return(
+      <div>
+        <Form
+          className=""
+          form={fillOrderForm}
+          name="fill order"
+          onFinish={async values => {
+/*             setFill(true); */
+            const subgraphQuery =  await client.query(tokensQuery).toPromise();
+            const orderPrice = subgraphQuery.data.erc721Orders[0].erc20TokenAmount;
+            console.log("entire query: ", subgraphQuery);
+            console.log("orderprice being filled: ", orderPrice);  
+            const PurchasePrice = {
+              tokenAddress: ETH_ADDRESS_AS_ERC20, 
+              amount: orderPrice,
+              type: 'ERC20'
+            }
+            try {
+              const approvalStatusForUserB = await nftSwapSdk.loadApprovalStatus(
+                nftToSwapUserB,
+                walletAddressUserB
+              );
+              console.log("approval check: ", approvalStatusForUserB); 
+              
+              // If we do need to approve User A's NFT for swapping, let's do that now
+              if (!approvalStatusForUserB.contractApproved) {
+                const txCur = await tx(nftSwapSdk.approveTokenOrNftByAsset(
+                nftToSwapUserB,
+                walletAddressUserB
+                ));
+              }
+              
+              const reconstructedOnchainOrder = 
+    //testorder              
+              [
+                [0, "0x806164c929ad3a6f4bd70c2370b3ef36c64deaa8", "0x0000000000000000000000000000000000000000", "2524604400", "100131415900000000000000000000000000000278871891236123933663926623449196810869", "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", "1000000000000000", [], "0xa4248ac1a4fc557134802f39cddf830fde6dda06", "1", []]                
+              ]
 
-      const nftSwapSdk = new NftSwapV4(localProvider, userSigner, CHAIN_ID);
+/*               const reconstructedOnchainOrder = [
+                subgraphQuery.data.erc721Orders[0].direction, // trade direction (0 = sell, 1 = buy)
+                subgraphQuery.data.erc721Orders[0].maker, // maker address
+                subgraphQuery.data.erc721Orders[0].taker, // taker address 
+                subgraphQuery.data.erc721Orders[0].expiry, // expiry from creation of original order?
+                subgraphQuery.data.erc721Orders[0].nonce, // nonce
+                subgraphQuery.data.erc721Orders[0].erc20Token, // erc20token
+                BigNumber.from(subgraphQuery.data.erc721Orders[0].erc20TokenAmount).toString(), // erc20 token amount (hardhcoded to 0.01 eth)
+                [], // fees (none included atm)
+                subgraphQuery.data.erc721Orders[0].erc721Token, // erc721 nft contract
+                subgraphQuery.data.erc721Orders[0].erc721tokenId, // erc721 nft contract token id
+                [] // erc721 token properties (none included atm)
+              ]         */      
+              
+              const nullSignatureStruct = {
+                // These value indicates that the order maker has previously marked the order as fillable on-chain. The remaining fields in the Signature struct will be ignored.
+                // link to where this explanation comes from: https://docs.0x.org/protocol/docs/signatures         
+                "r": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "s": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "v": 0,
+                "signatureType": 4
+              }              
 
-   // Check if we need to approve the NFT for swapping
-      const approvalStatusForUserB = await nftSwapSdk.loadApprovalStatus(
-        ethToSwapUserB,
-        walletAddressUserB
-      );      
+              const txCur2 = await nftSwapSdk.exchangeProxy.buyERC721(
+                reconstructedOnchainOrder,
+                nullSignatureStruct,
+                "0x",
+                { value: BigNumber.from(subgraphQuery.data.erc721Orders[0].erc20TokenAmount).toString() }
+              )
+              await txCur2.wait();
+/*               setFill(false); */
+            } catch (e) {
+              console.log("fill order failed", e)
+/*               setFill(false); */
+            }         
+          }}
+          onFinishFailed={onFinishFailed}
+        >
+          <Form.Item>
+            <Button
+            style={{ backgroundColor: "#e26843", color: "#791600", border: "4px solid #791600", fontSize: "1.25rem", height: "auto", borderRadius: 20  }} 
+            type="primary"
+            htmlType="submit"
+/*             loading={fill} */
+            >
+            BUY
+            </Button>
+          </Form.Item>
+        </Form>
+      </div>
+    )
+  }
 
-      if (!approvalStatusForUserB.contractApproved) {
-        const approvalTx = await tx(nftSwapSdk.approveTokenOrNftByAsset(
-        ethToSwapUserB,
-        walletAddressUserB
-        ));
-      }   
+  const marketplaceManager = () => {
+    const [transferHelper, setTransferHelper] = useState(false);
+    const [moduleManager, setModuleManager] = useState(false);
 
-      const reconstructedOnchainOrder = [
-        subgraphQuery.data.erc721Orders[0].direction, // trade direction (0 = sell, 1 = buy)
-        subgraphQuery.data.erc721Orders[0].maker, // maker address
-        subgraphQuery.data.erc721Orders[0].taker, // taker address 
-        subgraphQuery.data.erc721Orders[0].expiry, // expiry from creation of original order?
-        subgraphQuery.data.erc721Orders[0].nonce, // nonce
-        subgraphQuery.data.erc721Orders[0].erc20Token, // erc20token
-        subgraphQuery.data.erc721Orders[0].erc20TokenAmount, // erc20 token amount (hardhcoded to 0.01 eth)
-        [], // fees (none included atm)
-        subgraphQuery.data.erc721Orders[0].erc721Token, // erc721 nft contract
-        subgraphQuery.data.erc721Orders[0].erc721tokenId, // erc721 nft contract token id
-        [] // erc721 token properties (none included atm)
-      ]
-
-      const nullSignatureStruct = {
-        // These value indicates that the order maker has previously marked the order as fillable on-chain. The remaining fields in the Signature struct will be ignored.
-        // link to where this explanation comes from: https://docs.0x.org/protocol/docs/signatures         
-        "r": "0x0000000000000000000000000000000000000000000000000000000000000000",
-        "s": "0x0000000000000000000000000000000000000000000000000000000000000000",
-        "v": 0,
-        "signatureType": 4
-      }
-
-      const fillTx = await tx(nftSwapSdk.exchangeProxy.buyERC721(
-        reconstructedOnchainOrder,
-        nullSignatureStruct,
-        "0x", // null taker address passed into callback data param
-        { value: BigNumber.from(subgraphQuery.data.erc721Orders[0].erc20TokenAmount).toString() }
-      ));
-
-    }
+    return (
+      <div className="approvalPopOverManager">
+        <div className="pleaseApprovePopover">
+          Lost & Found is built on the ZORA marketplace protocol. Please sign the following approvals to allow the protocol to interact with your assets : {/* ↓ ↓ */}
+        </div>
+        {erc721TransferHelperApproved == true ? (
+          <div
+            className="erc721ApprovedPopover"
+            style={{  }}>
+            NFT TRANSFER HELPER IS APPROVED ✅
+          </div>
+          ) : (
+          <Button
+          className="erc721ApprovalButtonPopover"   
+          style= {{ backgroundColor: "#d87456", color: "#791600", border: "4px solid #791600", fontSize: "1rem", height: "auto", borderRadius: 20  }}
+            type="primary"
+            loading={transferHelper}
+            onClick={async () => {
+              setTransferHelper(true);
+              try {
+                const txCur = await tx(writeContracts[lostandfoundNFTContract].setApprovalForAll(
+                  mainnetZoraAddresses.ERC721TransferHelper,
+                  true
+                ));
+                await txCur.wait();
+                updateOneOldEnglish();
+                setTransferHelper(false);
+              } catch (e) {
+                console.log("ERC721Transfer HelperApproval Failed", e);
+                setTransferHelper(false);
+              }
+            }}
+          >            
+            APPROVE NFT TRANSFER HELPER
+          </Button>
+          )}
+          {zoraModuleManagerApproved == true ? (
+          <div className="zmmApprovedPopover">
+            MARKETPLACE PROTOCOL IS APPROVED ✅ 
+          </div>              
+          ) : (
+          <Button
+            className="zmmApprovalButtonPopover"
+            style={{ backgroundColor: "#4998ff", color: "#283cc4", border: "4px solid #283cc4", fontSize: "1rem", height: "auto", borderRadius: 20, verticalAlign: "center" }}
+            type="primary"
+            loading={moduleManager}
+            onClick={async () => {
+              setModuleManager(true);
+              try {
+                const txCur = await tx(writeContracts[zmmContract].setApprovalForModule(
+                  mainnetZoraAddresses.AsksV1_1, 
+                  true
+                ));
+                await txCur.wait();
+                updateOneOldEnglish();
+                setModuleManager(false);
+              } catch (e) {
+                console.log("ZORA Module Manager Approval Failed", e);
+                setModuleManager(false);
+              }
+            }}
+          >      
+            APPROVE MARKETPLACE PROTOCOL
+          </Button>
+          )}
+      </div>
+    )
+  }  
 
   return (
     <div className="OldEnglish">
@@ -975,8 +812,19 @@ function OldEnglish({
                                   type="primary">
                                   CANCEL
                                 </Button>
-                              </Popover>                                                                                                                                                              
-                              <Button disabled={false} onClick={fillOrder} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">BUY</Button>
+                              </Popover> 
+                              <Popover
+                                placement="top"
+                                  content={() => {                                                        
+                                    return fillOrder(id);
+                                  }}
+                                >
+                                <Button
+                                  style={{ borderRadius: 2, border: "1px solid black", backgroundColor: "white", color: "#3e190f", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }}
+                                  type="primary">
+                                  BUY
+                                </Button>
+                              </Popover>                           
                             </div>                             
                           </div>
                           ) : (
@@ -1127,14 +975,14 @@ function OldEnglish({
                                   <div className="marketplaceManager">
                                     <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">LIST</Button>
                                     <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">CANCEL</Button>                                    
-                                    <Popover
+{/*                                     <Popover
                                       className="fillAskPopver"
                                       content={() => {                                                        
                                         return fillAsk(id);
                                       }}                                      
                                     >  
                                       <Button style={{ borderRadius: 2, border: "1px solid black", backgroundColor: "white", color: "#3e190f", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">BUY</Button>
-                                    </Popover>
+                                    </Popover> */}
                                   </div> 
                                 </div>
                               )} 
