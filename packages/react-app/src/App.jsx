@@ -77,7 +77,7 @@ function App(props) {
   const lostandfoundNFTContract = "lostandFoundContract4"; // update address of lostandFoundContract2 if redeploying an identical nft contract for testing purposes
   const lostandfoundNFTContractAddress = "0x9Fd7ad2ECF7510EddCf0e6a345188d9dF23805ac"; // change this to the nft contract you want to be interacting with
   
-  const zeroExErc721StatusContract = "zeroExErc721StatusROPSTEN";
+  const zeroExErc721StatusContract = "zeroExErc721OrdersFeatureROPSTEN";
   //======my custom additions
 
   // specify all the chains your app is available on. Eg: ['localhost', 'mainnet', ...otherNetworks ]
@@ -332,6 +332,7 @@ function App(props) {
               lostandfoundNFTContractAddress={lostandfoundNFTContractAddress}
               erc721TransferHelperApproved={erc721TransferHelperApproved}
               zoraModuleManagerApproved={zoraModuleManagerApproved}
+              zeroExErc721StatusContract={zeroExErc721StatusContract}
               priceOfMint={priceOfMint}
               maxSupply={maxSupply}
               balance={balance}

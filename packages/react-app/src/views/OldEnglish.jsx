@@ -33,11 +33,12 @@ function OldEnglish({
 /*   zoraTransferHelperContract, */
   zmmContract,
   zoraAsksContract,
+  zeroExErc721StatusContract,
   lostandfoundNFTContract,
   lostandfoundNFTContractAddress,
   erc721TransferHelperApproved,
   zoraModuleManagerApproved,
-  maxSupply
+  maxSupply,
 //========== MY CUSTOM IMPORTS
 }) {
   const [allOldEnglish, setAllOldEnglish] = useState({});
@@ -553,10 +554,10 @@ function OldEnglish({
           
               // If we do need to approve User A's NFT for swapping, let's do that now
               if (!approvalStatusForUserA.contractApproved) {
-                const txCur = await nftSwapSdk.approveTokenOrNftByAsset(
+                const txCur = await tx(nftSwapSdk.approveTokenOrNftByAsset(
                 nftToSwapUserA,
                 walletAddressUserA
-                );
+                ));
               const approvalTxReceipt = await txCur.wait();
           /*          console.log(
               `Approved ${assetsToSwapUserA[0].tokenAddress} contract to swap with 0x v4 (txHash: ${approvalTxReceipt.transactionHash})`
@@ -573,7 +574,7 @@ function OldEnglish({
                 },
                 walletAddressUserA
               );
-              const txCur2 = await nftSwapSdk.exchangeProxy.preSignERC721Order(order); 
+              const txCur2 = await tx(nftSwapSdk.exchangeProxy.preSignERC721Order(order)); 
               await txCur2.wait();
               setListing(false);
             } catch (e) {
@@ -663,8 +664,9 @@ function OldEnglish({
     const tokensQuery = `
     query {
       erc721Orders(
-        orderBy: nonce
         where: {erc721Token: "${lostandfoundNFTContractAddress}", erc721TokenId: "${id}" }
+        orderBy: nonce
+        orderDirection: desc
       ) {
         id
         direction
@@ -685,6 +687,8 @@ function OldEnglish({
       }
     }
   `
+
+  /* const caporder = [0, "0x806164c929ad3a6f4bd70c2370b3ef36c64deaa8", "0x0000000000000000000000000000000000000000", "2524604400", "100131415900000000000000000000000000000335459530157037663109949482927682142993", "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", "250000000000000000", [], "0x9fd7ad2ecf7510eddcf0e6a345188d9df23805ac", "2", []] */
   
   const client = createClient({
     url: APIURL
@@ -701,8 +705,15 @@ function OldEnglish({
             const subgraphQuery =  await client.query(tokensQuery).toPromise();
             const orderNonceToCancel = subgraphQuery.data.erc721Orders[0].nonce;
             console.log("Order Nonce Being Cancelled: ", orderNonceToCancel);
+            console.log("entire order being indexed: ", subgraphQuery.data.erc721Orders[0])
+            console.log("0x contract: ", zeroExErc721StatusContract)
+            console.log("zora", zoraAsksContract); //cancelERC721Order
+            console.log("nftswapexchangeproxy", nftSwapSdk.exchangeProxy)
             try {
-              const txCur = await tx(nftSwapSdk.exchangeProxy.cancelERC721Order(orderNonceToCancel))
+//tx(writeContracts[zeroExErc721StatusContract].cancelERC721Order(orderNonceToCancel))
+//nftSwapSdk.exchangeProxy.cancelERC721Order(orderNonceToCancel));
+
+              const txCur = await tx(writeContracts[zeroExErc721StatusContract].cancelERC721Order(orderNonceToCancel));
               await txCur.wait();
               setCancel(false);
             } catch (e) {

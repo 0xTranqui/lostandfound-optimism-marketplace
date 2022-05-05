@@ -1,6 +1,6 @@
 //importing my own ABIs that I generated with eth-sdk
 
-const zeroExErc721Status = [
+const ZEROEXERC721ORDERSFEATUREABI = [
     {
         inputs: [
             {
@@ -1929,7 +1929,7 @@ const zeroExErc721Status = [
         stateMutability: "view",
         type: "function",
     },
-]
+];
 
 const LOSTANDFOUNDCONTRACT4ABI = [
     {
@@ -6101,38 +6101,38 @@ module.exports = {
       lostandFoundContract4: {
           address: "0x60bf8601de15c9fFC689314E7E76C701a1b01645",
           abi: LOSTANDFOUNDCONTRACT4ABI,
-      }      
+      },      
     },
   },
-    3: {
-        contracts: {
-            zoraTransferHelperROPSTEN: {
-                address: "0x0afB6A47C303f85c5A6e0DC6c9b4c2001E6987ED",
-                abi: ZORATRANSFERHELPERABI,
-            },
-            zoraModuleManagerROPSTEN: {
-                address: "0x3120f8A161bf8ae8C4287A66920E7Fd875b41805",
-                abi: ZORAMODULEMANAGERABI,
-            },
-            zoraAsksV1_1ModuleROPSTEN: {
-                address: "0x03abaccb86f7bc2990181b71c2ef85927bf41044",
-                abi: ZORAASKSV1_1MODULEABI,
-            },
-            lostandFoundContract4: {
-                address: "0x9Fd7ad2ECF7510EddCf0e6a345188d9dF23805ac",
-                abi: LOSTANDFOUNDCONTRACT4ABI,
-            zeroExErc721StatusROPSTEN: {
-                address: "0x72657b338391c6A55120EB786a2b4FecED7D3Be2",
-                abi: zeroExErc721Status
-            }
-        }        
+  3: {
+    contracts: {
+        zoraTransferHelperROPSTEN: {
+            address: "0x0afB6A47C303f85c5A6e0DC6c9b4c2001E6987ED",
+            abi: ZORATRANSFERHELPERABI,
+        },
+        zoraModuleManagerROPSTEN: {
+            address: "0x3120f8A161bf8ae8C4287A66920E7Fd875b41805",
+            abi: ZORAMODULEMANAGERABI,
+        },
+        zoraAsksV1_1ModuleROPSTEN: {
+            address: "0x03abaccb86f7bc2990181b71c2ef85927bf41044",
+            abi: ZORAASKSV1_1MODULEABI,
+        },
+        zeroExErc721OrdersFeatureROPSTEN: {
+            address: "0x72657b338391c6a55120eb786a2b4feced7d3be2",
+            abi: ZEROEXERC721ORDERSFEATUREABI,
+        },      
+        lostandFoundContract4: {
+            address: "0x9fd7ad2ecf7510eddcf0e6a345188d9df23805ac",
+            abi: LOSTANDFOUNDCONTRACT4ABI,
+        }      
     },
-  },
+  },  
     10: {
         contracts: {
             zeroExErc721StatusOPTIMISM: {
                 address: "0x0C58C1170f1DEd633862A1166f52107490a9C594",
-                abi: zeroExErc721Status,
+                abi: ZEROEXERC721ORDERSFEATUREABI,
             },
         }        
     },  
