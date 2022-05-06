@@ -11,7 +11,6 @@ export const ETHERSCAN_KEY = process.env.REACT_APP_ETHERSCAN_KEY;
 export const BLOCKNATIVE_DAPPID = "0b58206a-f3c0-4701-a62f-73c7243e8c77";
 
 export const ALCHEMY_KEY = process.env.REACT_APP_ALCHEMY_KEY;
-//my own alchemy key (zora-acution-house-v1-rinkeby)
 
 export const NETWORKS = {
   localhost: {
