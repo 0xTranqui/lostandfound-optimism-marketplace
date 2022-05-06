@@ -120,7 +120,7 @@ function OldEnglish({
         subgraphQuery.data.erc721Orders[0].expiry, // expiry from creation of original order?
         subgraphQuery.data.erc721Orders[0].nonce, // nonce
         subgraphQuery.data.erc721Orders[0].erc20Token, // erc20token
-        subgraphQuery.data.erc721Orders[0].erc20TokenAmount,//BigNumber.from(subgraphQuery.data.erc721Orders[0].erc20TokenAmount).toString(), // erc20 token amount (hardhcoded to 0.01 eth)
+        subgraphQuery.data.erc721Orders[0].erc20TokenAmount, // erc20 token amount (hardhcoded to 0.01 eth)
         [], // fees (none included atm)
         subgraphQuery.data.erc721Orders[0].erc721Token, // erc721 nft contract
         subgraphQuery.data.erc721Orders[0].erc721TokenId, // erc721 nft contract token id
@@ -135,7 +135,7 @@ function OldEnglish({
           subgraphQuery.data.erc721Orders[0].expiry, // expiry from creation of original order?
           subgraphQuery.data.erc721Orders[0].nonce, // nonce
           subgraphQuery.data.erc721Orders[0].erc20Token, // erc20token
-          subgraphQuery.data.erc721Orders[0].erc20TokenAmount,//BigNumber.from(subgraphQuery.data.erc721Orders[0].erc20TokenAmount).toString(), // erc20 token amount (hardhcoded to 0.01 eth)
+          subgraphQuery.data.erc721Orders[0].erc20TokenAmount, // erc20 token amount (hardhcoded to 0.01 eth)
           [], // fees (none included atm)
           subgraphQuery.data.erc721Orders[0].erc721Token, // erc721 nft contract
           subgraphQuery.data.erc721Orders[0].erc721TokenId, // erc721 nft contract token id
@@ -152,7 +152,6 @@ function OldEnglish({
   const fetchMetadataAndUpdate = async id => {
 
     try {
-      // console.log("did subgraphmetadata persist")
       const tokenURI = await readContracts[lostandfoundNFTContract].tokenURI(id);
       const nftMetadataURL = "https://ipfs.io/ipfs/" + tokenURI.substring(7); 
       const nftMetadataFetch = await fetch(nftMetadataURL); 
@@ -165,108 +164,15 @@ function OldEnglish({
 
       const currentOrderData = await fetchZeroExOrderData(id);
 
- /*      const orderStatus = await readContracts[zeroExErc721StatusContract].getERC721OrderStatus([
-        subgraphQuery.data.erc721Orders[0].direction, // trade direction (0 = sell, 1 = buy)
-        subgraphQuery.data.erc721Orders[0].maker, // maker address
-        subgraphQuery.data.erc721Orders[0].taker, // taker address 
-        subgraphQuery.data.erc721Orders[0].expiry, // expiry from creation of original order?
-        // subgraphQuery.data.erc721Orders[0].nonce, // nonce
-        subgraphQuery.data.erc721Orders[0].erc20Token, // erc20token
-        //BigNumber.from(subgraphQuery.data.erc721Orders[0].erc20TokenAmount).toString(), // erc20 token amount (hardhcoded to 0.01 eth)
-        [], // fees (none included atm)
-        subgraphQuery.data.erc721Orders[0].erc721Token, // erc721 nft contract
-        subgraphQuery.data.erc721Orders[0].erc721tokenId, // erc721 nft contract token id
-        [] // erc721 token properties (none included atm)
-      ])
-      console.log("orderStatus", orderStatus) */
-
-/*     if (orderToCheck > & ) {
-      const orderStatus = await readContracts[zeroExErc721StatusContract].getERC721OrderStatus([
-        subgraphQuery.data.erc721Orders[0].direction, // trade direction (0 = sell, 1 = buy)
-        subgraphQuery.data.erc721Orders[0].maker, // maker address
-        subgraphQuery.data.erc721Orders[0].taker, // taker address 
-        subgraphQuery.data.erc721Orders[0].expiry, // expiry from creation of original order?
-        subgraphQuery.data.erc721Orders[0].nonce, // nonce
-        subgraphQuery.data.erc721Orders[0].erc20Token, // erc20token
-        //BigNumber.from(subgraphQuery.data.erc721Orders[0].erc20TokenAmount).toString(), // erc20 token amount (hardhcoded to 0.01 eth)
-        [], // fees (none included atm)
-        subgraphQuery.data.erc721Orders[0].erc721Token, // erc721 nft contract
-        subgraphQuery.data.erc721Orders[0].erc721tokenId, // erc721 nft contract token id
-        [] // erc721 token properties (none included atm)
-      ])
-      console.log("orderStatus", orderStatus);
-      if (orderStatus == 1 ) {
-        let currentOrderMetadata = [
-          subgraphQuery.data.erc721Orders[0].direction, // trade direction (0 = sell, 1 = buy)
-          subgraphQuery.data.erc721Orders[0].maker, // maker address
-          subgraphQuery.data.erc721Orders[0].taker, // taker address 
-          subgraphQuery.data.erc721Orders[0].expiry, // expiry from creation of original order?
-          subgraphQuery.data.erc721Orders[0].nonce, // nonce
-          subgraphQuery.data.erc721Orders[0].erc20Token, // erc20token
-          //BigNumber.from(subgraphQuery.data.erc721Orders[0].erc20TokenAmount).toString(), // erc20 token amount (hardhcoded to 0.01 eth)
-          [], // fees (none included atm)
-          subgraphQuery.data.erc721Orders[0].erc721Token, // erc721 nft contract
-          subgraphQuery.data.erc721Orders[0].erc721tokenId, // erc721 nft contract token id
-          [] // erc721 token properties (none included atm)          
-        ]
-        console.log("currentorderMetadat", currentOrderMetadata);
-        console.log("length of currentmetadata array", currentOrderMetadata.length)
-         return currentOrderMetadata   
-      }
-    } */
-
-
-/*     if (orderToCheck == 1) {
-      const currentOrderMetadata = [] // length of zero signifies no active order because no order history for given token      
-      console.log("currentorderMetadata", currentOrderMetadata);
-      console.log("length of currentmetadata array", currentOrderMetadata.length)
-      return currentOrderMetadata
-    } else {
-      const orderStatus = await readContracts[zeroExErc721StatusContract].getERC721OrderStatus([
-        subgraphQuery.data.erc721Orders[0].direction, // trade direction (0 = sell, 1 = buy)
-        subgraphQuery.data.erc721Orders[0].maker, // maker address
-        subgraphQuery.data.erc721Orders[0].taker, // taker address 
-        subgraphQuery.data.erc721Orders[0].expiry, // expiry from creation of original order?
-        subgraphQuery.data.erc721Orders[0].nonce, // nonce
-        subgraphQuery.data.erc721Orders[0].erc20Token, // erc20token
-        //BigNumber.from(subgraphQuery.data.erc721Orders[0].erc20TokenAmount).toString(), // erc20 token amount (hardhcoded to 0.01 eth)
-        [], // fees (none included atm)
-        subgraphQuery.data.erc721Orders[0].erc721Token, // erc721 nft contract
-        subgraphQuery.data.erc721Orders[0].erc721tokenId, // erc721 nft contract token id
-        [] // erc721 token properties (none included atm)
-      ])
-      if (orderStatus ==! 1) {
-        const currentOrderMetadata = [] // length of zero signifies no active order because no order history for given token       
-        console.log("currentorderMetadat", currentOrderMetadata);
-        console.log("length of currentmetadata array", currentOrderMetadata.length)
-        return currentOrderMetadata
-      } else {
-        const currentOrderMetadata = [
-          subgraphQuery.data.erc721Orders[0].direction, // trade direction (0 = sell, 1 = buy)
-          subgraphQuery.data.erc721Orders[0].maker, // maker address
-          subgraphQuery.data.erc721Orders[0].taker, // taker address 
-          subgraphQuery.data.erc721Orders[0].expiry, // expiry from creation of original order?
-          subgraphQuery.data.erc721Orders[0].nonce, // nonce
-          subgraphQuery.data.erc721Orders[0].erc20Token, // erc20token
-          //BigNumber.from(subgraphQuery.data.erc721Orders[0].erc20TokenAmount).toString(), // erc20 token amount (hardhcoded to 0.01 eth)
-          [], // fees (none included atm)
-          subgraphQuery.data.erc721Orders[0].erc721Token, // erc721 nft contract
-          subgraphQuery.data.erc721Orders[0].erc721tokenId, // erc721 nft contract token id
-          [] // erc721 token properties (none included atm)          
-        ]    
-      } 
-    }  */
-
       try {        
         const nftMetadataObject = await nftMetadataFetch.json();
         const collectibleUpdate = {};
-
-     /*    console.log(nftMetadataObject); */
 
         //===== CUSTOM UPDATE, added askSeller: seller and nftOwner: ownerAddress as key:value pairs
         collectibleUpdate[id] = { id: id, uri: tokenURI, orderData: currentOrderData, askSeller: seller, nftOwner: ownerAddressCleaned, ...nftMetadataObject};
         console.log("collectible update", collectibleUpdate);
   /*       console.log("order status ", orderStatus) */
+
         //====== CUSTOM UPDATE
 
         setAllOldEnglish(i => ({ ...i, ...collectibleUpdate }));
@@ -578,15 +484,14 @@ function OldEnglish({
             const subgraphQuery =  await client.query(tokensQuery).toPromise();
             const orderPrice = subgraphQuery.data.erc721Orders[0].erc20TokenAmount;
             console.log("entire query: ", subgraphQuery);
-            console.log("orderprice being filled: ", orderPrice);  
             const PurchasePrice = {
               tokenAddress: ETH_ADDRESS_AS_ERC20, 
-              amount: orderPrice,
+              amount: subgraphQuery.data.erc721Orders[0].erc20TokenAmount,
               type: 'ERC20'
             }
             try {
               const approvalStatusForUserB = await nftSwapSdk.loadApprovalStatus(
-                nftToSwapUserB,
+                PurchasePrice,
                 walletAddressUserB
               );
               console.log("approval check: ", approvalStatusForUserB); 
@@ -594,30 +499,30 @@ function OldEnglish({
               // If we do need to approve User A's NFT for swapping, let's do that now
               if (!approvalStatusForUserB.contractApproved) {
                 const txCur = await tx(nftSwapSdk.approveTokenOrNftByAsset(
-                nftToSwapUserB,
+                PurchasePrice,
                 walletAddressUserB
                 ));
               }
               
-              const reconstructedOnchainOrder = 
+/*               const reconstructedOnchainOrder = 
     //testorder              
               [
                 [0, "0x806164c929ad3a6f4bd70c2370b3ef36c64deaa8", "0x0000000000000000000000000000000000000000", "2524604400", "100131415900000000000000000000000000000278871891236123933663926623449196810869", "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", "1000000000000000", [], "0xa4248ac1a4fc557134802f39cddf830fde6dda06", "1", []]                
-              ]
+              ] */
 
-/*               const reconstructedOnchainOrder = [
+              const reconstructedOnchainOrder = [
                 subgraphQuery.data.erc721Orders[0].direction, // trade direction (0 = sell, 1 = buy)
                 subgraphQuery.data.erc721Orders[0].maker, // maker address
                 subgraphQuery.data.erc721Orders[0].taker, // taker address 
                 subgraphQuery.data.erc721Orders[0].expiry, // expiry from creation of original order?
                 subgraphQuery.data.erc721Orders[0].nonce, // nonce
                 subgraphQuery.data.erc721Orders[0].erc20Token, // erc20token
-                BigNumber.from(subgraphQuery.data.erc721Orders[0].erc20TokenAmount).toString(), // erc20 token amount (hardhcoded to 0.01 eth)
+                subgraphQuery.data.erc721Orders[0].erc20TokenAmount, // erc20 token amount (hardhcoded to 0.01 eth)
                 [], // fees (none included atm)
                 subgraphQuery.data.erc721Orders[0].erc721Token, // erc721 nft contract
-                subgraphQuery.data.erc721Orders[0].erc721tokenId, // erc721 nft contract token id
+                subgraphQuery.data.erc721Orders[0].erc721TokenId, // erc721 nft contract token id
                 [] // erc721 token properties (none included atm)
-              ]         */      
+              ]              
               
               const nullSignatureStruct = {
                 // These value indicates that the order maker has previously marked the order as fillable on-chain. The remaining fields in the Signature struct will be ignored.
@@ -634,6 +539,16 @@ function OldEnglish({
                 "0x",
                 { value: BigNumber.from(subgraphQuery.data.erc721Orders[0].erc20TokenAmount).toString() }
               )
+
+/*            
+              *potentially need to repalce current buy function with one that points at the ERC721OrdersFeature contract, similarly to what I did with cancel?
+              const txCur2 = await writeContracts[zeroExErc721StatusContract].buyERC721(
+                reconstructedOnchainOrder,
+                nullSignatureStruct,
+                "0x",
+                { value: BigNumber.from(subgraphQuery.data.erc721Orders[0].erc20TokenAmount).toString(), gasLimit: 1000000 }
+              )
+ */
               await txCur2.wait();
 /*               setFill(false); */
             } catch (e) {
@@ -843,8 +758,10 @@ function OldEnglish({
                     >
                       <img className="nftImage" src={imageWithGateway && imageWithGateway} alt={"LF #" + id} width="100%" />
                     </a>
+
+                    
                     <div className="cardFooters">
-                      {item.askSeller.seller == "0x0000000000000000000000000000000000000000" ? ( // listing inactive
+                      {item.orderData.length == 0 ? ( // sale = inactive
                         <div className="activityWrapper">
                           <div className="listingStatusManager">
                             <div>
@@ -865,124 +782,37 @@ function OldEnglish({
                             <div className="listingFindersFee">
                             ARTIST ROYALTY : 15%
                             </div>
-                          </div>
-                          { erc721TransferHelperApproved == false || zoraModuleManagerApproved == false ? ( // listing inactive  &  marketplace protocols not approved
-                          <div className="approvals_and_functions_wrapper">
-{/* 
-  
-  taking out approval button
-
-                            <Popover
-                              className="popoverMaster"
-                              placement="top"
-                              content={() => {                                                        
-                                return marketplaceManager();
-                              }}
-                            >
-                              <Button
-                                className="marketplaceApprovalButton"
-                                disabled={false}
-                                style={{  backgroundColor: "#f7f8f9", color: "#203466", borderRadius: 2, border: "1px solid black", width: "97%", fontSize: "1.2rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} 
-                                type="primary"
-                              >
-                                APPROVE MARKETPLACE PROTOCOLS
-                              </Button>
-                            </Popover>
-
-                             */}
-                            <div className="marketplaceManager">
-                              <Popover
-                                placement="top"
-                                  content={() => {                                                        
-                                    return createOrder(id);
-                                  }}
-                                >
-                                <Button
-                                  style={{ borderRadius: 2, border: "1px solid black", backgroundColor: "white", color: "#3e190f", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }}
-                                  type="primary">
-                                  LIST
-                                </Button>
-                              </Popover>
-                              <Popover
-                                placement="top"
-                                  content={() => {                                                        
-                                    return cancelOrder(id);
-                                  }}
-                                >
-                                <Button
-                                  style={{ borderRadius: 2, border: "1px solid black", backgroundColor: "white", color: "#3e190f", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }}
-                                  type="primary">
-                                  CANCEL
-                                </Button>
-                              </Popover> 
-                              <Popover
-                                placement="top"
-                                  content={() => {                                                        
-                                    return fillOrder(id);
-                                  }}
-                                >
-                                <Button
-                                  style={{ borderRadius: 2, border: "1px solid black", backgroundColor: "white", color: "#3e190f", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }}
-                                  type="primary">
-                                  BUY
-                                </Button>
-                              </Popover>                           
-                            </div>                             
-                          </div>
+                          </div>                         
+                          { item.nftOwner == address.toLowerCase() ? ( // listing inactive &  app user is owner
+                            <div className="approvals_and_functions_wrapper">
+                              <div className="marketplaceManager">
+                                <Popover
+                                  placement="top"
+                                    content={() => {                                                        
+                                      return createOrder(id);
+                                    }}
+                                  >
+                                  <Button
+                                    style={{ borderRadius: 2, border: "1px solid black", backgroundColor: "white", color: "#3e190f", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }}
+                                    type="primary">
+                                    LIST
+                                  </Button>
+                                </Popover>
+                                <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">CANCEL</Button>
+                                <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">BUY</Button>                      
+                              </div>                             
+                            </div>
                           ) : (
-                            <>
-                              { item.nftOwner == address.toLowerCase() ? ( // listing inactive  &  marketplace protocols approved  &  app user is owner
-                                <div className="approvals_and_functions_wrapper">
-{/* 
-    taking out approvals button
-                                  <Button
-                                    className="marketplaceApprovalButton"
-                                    disabled={true}
-                                    style={{ borderRadius: 2, border: "1px solid black", width: "97%", fontSize: "1.2rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} 
-                                    type="primary"
-                                  >
-                                    MARKETPLACE PROTOCOLS ARE APPROVED
-                                  </Button> 
-
- */}
-                                  <div className="marketplaceManager">
-                                  <Popover
-/*                                     placement="top"
-                                      content={() => {                                                        
-                                        return createAsk(id);
-                                      }} */
-                                    >
-                                      <Button style={{ borderRadius: 2, border: "1px solid black", backgroundColor: "white", color: "#3e190f", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">LIST</Button>
-                                    </Popover>
-                                    <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">CANCEL</Button>
-                                    <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">BUY</Button>                              
-                                  </div>  
-                                </div> 
-                                ) : ( // listing inactive  &  marketplace protocols approved  &  user not owner
-                                <div className="approvals_and_functions_wrapper">
-{/* 
-    taking out approvals button
-                                  <Button
-                                    className="marketplaceApprovalButton"
-                                    disabled={true}
-                                    style={{ borderRadius: 2, border: "1px solid black", width: "97%", fontSize: "1.2rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} 
-                                    type="primary"
-                                  >
-                                    MARKETPLACE PROTOCOLS ARE APPROVED
-                                  </Button>        
-
-                                   */}
-                                  <div className="marketplaceManager">
-                                    <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">LIST</Button>
-                                    <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">CANCEL</Button>
-                                    <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">BUY</Button>
-                                  </div> 
-                                </div>
-                              )} 
-                            </>
-                          )} {/* END OF INACTIVE SALE LOGIC */}
+                            <div className="approvals_and_functions_wrapper">
+                              <div className="marketplaceManager">
+                                <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">LIST</Button>
+                                <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">CANCEL</Button>
+                                <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">BUY</Button>                              
+                              </div>  
+                            </div>                                                                                
+                          )} {/* END OF INACTIVE SALE LOGIC */}                      
                         </div>
-                      ) : ( // listing active
+                      ) : (  // listing is active
                         <div className="activityWrapper">
                           <div className="listingStatusManager">
                             <div>
@@ -995,104 +825,57 @@ function OldEnglish({
                               />
                             </div>
                             <div className="listingStatus">
-                            LISTING : ACTIVE 
+                            LISTING : ACTIVE
                             </div>
-                            <div>                        
-                            PRICE : {item.askSeller.askPrice.toString() / (10 ** 18)} ETH
+                            <div className="listingPrice">
+                            PRICE : FILL THIS IN
                             </div>
-                            <div>
-                            FINDER'S FEE : {item.askSeller.findersFeeBps / 100} % 
+                            <div className="listingFindersFee">
+                            ARTIST ROYALTY : 15%
                             </div>
-                          </div>
-                          { erc721TransferHelperApproved == false || zoraModuleManagerApproved == false ? ( // listing active  &  marketplace protocols not approved
-                          <div className="approvals_and_functions_wrapper">
-{/* 
-    taking out approvals button
-                            <Popover
-                              className="popoverMaster"
-                              placement="top"
-                              content={() => {                                                        
-                                return marketplaceManager();
-                              }}
-                            >
-                              <Button
-                                className="marketplaceApprovalButton"
-                                disabled={false}
-                                style={{ backgroundColor: "white", color: "#3e190f", borderRadius: 2, border: "1px solid black", width: "97%", fontSize: "1.2rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} 
-                                type="primary"
-                              >
-                                APPROVE MARKETPLACE PROTOCOLS
-                              </Button>
-                            </Popover>
-
-                             */}
-                            <div className="marketplaceManager">
-                              <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">LIST</Button>
-                              <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">CANCEL</Button>
-                              <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">BUY</Button>
-                            </div>                             
-                          </div>
-                          ) : (     
-                            <>
-                              { item.nftOwner == address.toLowerCase() ? ( // listing active  &  marketplace protocols approved  &  app user is owner
-                                <div className="approvals_and_functions_wrapper">
-{/* 
-    taking out approvals button
-                                  <Button
-                                    className="marketplaceApprovalButton"
-                                    disabled={true}
-                                    style={{  borderRadius: 2, border: "1px solid black", width: "97%", fontSize: "1.2rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} 
-                                    type="primary"
+                          </div>                         
+                          { item.nftOwner == address.toLowerCase() ? ( // listing active &  app user is owner
+                            <div className="approvals_and_functions_wrapper">
+                              <div className="marketplaceManager">
+                                <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">LIST</Button>
+                                <Popover
+                                  placement="top"
+                                    content={() => {                                                        
+                                      return cancelOrder(id);
+                                    }}
                                   >
-                                    MARKETPLACE PROTOCOLS ARE APPROVED
-                                  </Button>  
-
- */}
-                                  <div className="marketplaceManager">                             
-                                    <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">LIST</Button>                                
-{/*                                     <Popover
-                                      content={() => {                                                        
-                                        return cancelAsk(id);
-                                      }}
-                                    >
-                                      <Button style={{ borderRadius: 2, border: "1px solid black", backgroundColor: "white", color: "#3e190f", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">CANCEL</Button>
-                                    </Popover> */}
-                                    <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">BUY</Button>
-                                  </div>  
-                                </div> 
-                                ) : ( // listing active  &  marketplace protocols approved  &  app user is not owner
-                                <div className="approvals_and_functions_wrapper">
-{/* 
-    taking out approvals button
                                   <Button
-                                    className="marketplaceApprovalButton"
-                                    disabled={true}
-                                    style={{  borderRadius: 2, border: "1px solid black", width: "97%", fontSize: "1.2rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} 
-                                    type="primary"
+                                    style={{ borderRadius: 2, border: "1px solid black", backgroundColor: "white", color: "#3e190f", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }}
+                                    type="primary">
+                                    CANCEL
+                                  </Button>
+                                </Popover>                                
+                                <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">BUY</Button>                      
+                              </div>                             
+                            </div>
+                          ) : ( // listing active and app user is not owner
+                            <div className="approvals_and_functions_wrapper">
+                              <div className="marketplaceManager">
+                                <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">LIST</Button>
+                                <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">CANCEL</Button>
+                                <Popover
+                                  placement="top"
+                                    content={() => {                                                        
+                                      return fillOrder(id);
+                                    }}
                                   >
-                                    MARKETPLACE PROTOCOLS ARE APPROVED
-                                  </Button>        
-
-                                   */}
-                                  <div className="marketplaceManager">
-                                    <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">LIST</Button>
-                                    <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">CANCEL</Button>                                    
-{/*                                     <Popover
-                                      className="fillAskPopver"
-                                      content={() => {                                                        
-                                        return fillAsk(id);
-                                      }}                                      
-                                    >  
-                                      <Button style={{ borderRadius: 2, border: "1px solid black", backgroundColor: "white", color: "#3e190f", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">BUY</Button>
-                                    </Popover> */}
-                                  </div> 
-                                </div>
-                              )} 
-                            </>                          
-                          )}                                                                                           
+                                  <Button
+                                    style={{ borderRadius: 2, border: "1px solid black", backgroundColor: "white", color: "#3e190f", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }}
+                                    type="primary">
+                                    BUY
+                                  </Button>
+                                </Popover>                                
+                              </div>  
+                            </div>                                                                                
+                          )} {/* END OF ACTIVE SALE LOGIC */}                      
                         </div>
                       )}
-                    </div>
+                    </div>                                                                                                                                                    
                   </Card>
                 </List.Item>
               );
