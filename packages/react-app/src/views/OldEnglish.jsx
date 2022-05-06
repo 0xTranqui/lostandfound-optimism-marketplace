@@ -783,7 +783,7 @@ function OldEnglish({
                             ARTIST ROYALTY : 15%
                             </div>
                           </div>                         
-                          { item.nftOwner == address.toLowerCase() ? ( // listing inactive &  app user is owner
+                          { item.nftOwner == address.toLowerCase() ? ( // listing inactive  &  app user is owner
                             <div className="approvals_and_functions_wrapper">
                               <div className="marketplaceManager">
                                 <Popover
@@ -828,13 +828,13 @@ function OldEnglish({
                             LISTING : ACTIVE
                             </div>
                             <div className="listingPrice">
-                            PRICE : FILL THIS IN
+                            PRICE : {"" + ( item.orderData[6] / (10 ** 18)) + " ETH"}
                             </div>
                             <div className="listingFindersFee">
                             ARTIST ROYALTY : 15%
                             </div>
                           </div>                         
-                          { item.nftOwner == address.toLowerCase() ? ( // listing active &  app user is owner
+                          { item.nftOwner == address.toLowerCase() ? ( // listing active  &  app user is owner
                             <div className="approvals_and_functions_wrapper">
                               <div className="marketplaceManager">
                                 <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">LIST</Button>
@@ -853,7 +853,7 @@ function OldEnglish({
                                 <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">BUY</Button>                      
                               </div>                             
                             </div>
-                          ) : ( // listing active and app user is not owner
+                          ) : ( // listing active & app user is not owner
                             <div className="approvals_and_functions_wrapper">
                               <div className="marketplaceManager">
                                 <Button disabled={true} style={{ borderRadius: 2, border: "1px solid black", fontSize: "1.4rem", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }} type="primary">LIST</Button>
