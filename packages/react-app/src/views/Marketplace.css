@@ -1,11 +1,13 @@
 :root {
    --logo-width: 60%;
+   --ownership-filer-options-font-size: 2rem;
 
 }
 
 @media (max-width: 750px) {
    :root {
       --logo-width: 90%;
+      --ownership-filer-options-font-size: 1.4rem;
    }
 }
 
@@ -53,7 +55,7 @@
    border: 1px transparent solid;
    border-radius: 20px;
    color: #f7f8f9;
-   font-size: 2rem;
+   font-size: var(--ownership-filer-options-font-size);
    width: auto;
    padding: 0px 10px;
 }
