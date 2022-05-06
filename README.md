@@ -55,4 +55,6 @@ This allows the hardhat.config.js file in the packages/hardhat directory to use 
 verification functionality we will be implementing without having to expose them publicly.
 
 
+*** FINAL SECTIONS IN PROGRESS :) ***
+
 Fin 🏁🏁
