@@ -71,9 +71,6 @@ function App(props) {
   const oldEnglishContract = "EightPack";
 
   //======my custom additions
-  const zoraTransferHelperContract = "zoraTransferHelperROPSTEN"; //change this in external_contracts.js to convert to rinkeby/mainnet
-  const zmmContract = "zoraModuleManagerROPSTEN"; //change this in external_contracts.js to convert to rinkeby/mainnet
-  const zoraAsksContract = "zoraAsksV1_1ModuleROPSTEN"; //change this in external_contracts.js to convert to rinkeby/mainnet
   const lostandfoundNFTContract = "lostandFoundOptimism"; // update address of lostandFoundContract2 if redeploying an identical nft contract for testing purposes
   const lostandfoundNFTContractAddress = "0xa4248aC1a4Fc557134802f39cddF830Fde6DdA06"; // change this to the nft contract you want to be interacting with
   
@@ -172,27 +169,6 @@ function App(props) {
   );
  //^this contract retreives the contractURI from the NFT contract
 
-  //=======ZORA Protocol Approval Checks
-  const erc721TransferHelperApproved = useContractReader(
-    readContracts,
-    lostandfoundNFTContract, //====***needs to be changed to eventual contract address
-    "isApprovedForAll",
-    [
-      address, //current signer
-      mainnetZoraAddresses.ERC721TransferHelper // ERC721TransferHelper
-    ]
-  );
-
-  const zoraModuleManagerApproved = useContractReader(
-    readContracts,
-    zmmContract,
-    "isModuleApproved",
-    [
-      address, //current signer 
-      mainnetZoraAddresses.AsksV1_1 ///zora ask module
-    ]
-  );
-
   // keep track of a variable from the contract in the local React state:
   const balance = useContractReader(readContracts, oldEnglishContract, "balanceOf", [address]);
   
@@ -286,8 +262,7 @@ function App(props) {
         
         <div className="networkAndAccountWrapper">
           <NetworkDisplay
-            className="headerNewtorkDisplay"
-                    
+            className="headerNewtorkDisplay"                    
             NETWORKCHECK={NETWORKCHECK}
             localChainId={localChainId}
             selectedChainId={selectedChainId}
@@ -325,13 +300,8 @@ function App(props) {
               DEBUG={DEBUG}
               oldEnglishContract={oldEnglishContract}
               userSigner={userSigner}
-              zoraTransferHelperContract={zoraTransferHelperContract}
-              zmmContract={zmmContract}
-              zoraAsksContract={zoraAsksContract}
               lostandfoundNFTContract={lostandfoundNFTContract}
               lostandfoundNFTContractAddress={lostandfoundNFTContractAddress}
-              erc721TransferHelperApproved={erc721TransferHelperApproved}
-              zoraModuleManagerApproved={zoraModuleManagerApproved}
               zeroExErc721StatusContract={zeroExErc721StatusContract}
               priceOfMint={priceOfMint}
               maxSupply={maxSupply}

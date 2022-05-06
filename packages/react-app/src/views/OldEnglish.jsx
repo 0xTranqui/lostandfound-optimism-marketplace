@@ -4,14 +4,11 @@ import { Address } from "../components";
 import { ethers, BigNumber } from "ethers";
 
 //========== MY CUSTOM IMPORTS
-import mainnetZoraAddresses from "@zoralabs/v3/dist/addresses/3.json"; // Rinkeby addresses, 1.json would be Rinkeby Testnet 
 import "./Marketplace.css";
 import LF_Logo_V2_5 from "./LF_Logo_V2_5.png";
 import LF_Logo_Blueprint from "./LF_Logo_Blueprint_0x.png";
-
 import { NftSwapV4, ETH_ADDRESS_AS_ERC20 } from '@traderxyz/nft-swap-sdk';
 import { createClient } from 'urql';
-
 //========== MY CUSTOM IMPORTS
 
 const APIURL = 'https://api.thegraph.com/subgraphs/name/0xtranqui/zeroex-nft-swap-v4-optimism-v4';
@@ -30,15 +27,9 @@ function OldEnglish({
   balance,
   userSigner,
 //========== MY CUSTOM IMPORTS
-/*   zoraTransferHelperContract, */
-  zmmContract,
-  zoraAsksContract,
   zeroExErc721StatusContract,
   lostandfoundNFTContract,
   lostandfoundNFTContractAddress,
-  erc721TransferHelperApproved,
-  zoraModuleManagerApproved,
-  maxSupply,
 //========== MY CUSTOM IMPORTS
 }) {
   const [allOldEnglish, setAllOldEnglish] = useState({});
@@ -148,7 +139,6 @@ function OldEnglish({
     } return currentOrderMetadata
   }
   
-  
   const fetchMetadataAndUpdate = async id => {
 
     try {
@@ -160,7 +150,6 @@ function OldEnglish({
       const ownerAddressCleaned = ownerAddress.toString().toLowerCase();
 
       //===== CUSTOM UPDATE
-      const seller = {seller: '0x0000000000000000000000000000000000000000', sellerFundsRecipient: '0x0000000000000000000000000000000000000000', askCurrency: '0x0000000000000000000000000000000000000000', findersFeeBps: 0, askPrice: BigNumber} ;
 
       const currentOrderData = await fetchZeroExOrderData(id);
 
@@ -168,11 +157,9 @@ function OldEnglish({
         const nftMetadataObject = await nftMetadataFetch.json();
         const collectibleUpdate = {};
 
-        //===== CUSTOM UPDATE, added askSeller: seller and nftOwner: ownerAddress as key:value pairs
-        collectibleUpdate[id] = { id: id, uri: tokenURI, orderData: currentOrderData, askSeller: seller, nftOwner: ownerAddressCleaned, ...nftMetadataObject};
+        //===== CUSTOM UPDATE, orderData: currentOrderData as key value pair
+        collectibleUpdate[id] = { id: id, uri: tokenURI, orderData: currentOrderData, nftOwner: ownerAddressCleaned, ...nftMetadataObject};
         console.log("collectible update", collectibleUpdate);
-  /*       console.log("order status ", orderStatus) */
-
         //====== CUSTOM UPDATE
 
         setAllOldEnglish(i => ({ ...i, ...collectibleUpdate }));
@@ -231,7 +218,7 @@ function OldEnglish({
     console.log("Failed:", errorInfo);
   };
 
-  let filteredOEs = Object.values(allOldEnglish).sort((a, b) => b.askSeller.askPrice - a.askSeller.askPrice);
+  let filteredOEs = Object.values(allOldEnglish).sort((a, b) => b.orderData.length - a.orderData.length);
   const [mine, setMine] = useState(false);
   if (mine == true && address && filteredOEs) {
     filteredOEs = filteredOEs.filter(function (el) {
@@ -240,6 +227,7 @@ function OldEnglish({
   }
 
   //========== 0x Protocol Create Order Flow ==========
+
   const [createOrderForm] = Form.useForm();
   const createOrder = id => {
     const [listing, setListing] = useState(false);
@@ -371,8 +359,6 @@ function OldEnglish({
   const client = createClient({
     url: APIURL
   })  
-
-  /* const caporder = [0, "0x806164c929ad3a6f4bd70c2370b3ef36c64deaa8", "0x0000000000000000000000000000000000000000", "2524604400", "100131415900000000000000000000000000000276072267468760131049939705133557812592", "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", "999000000000000000000", [], "0xa4248ac1a4fc557134802f39cddf830fde6dda06", "1", []] */
   
     return (
       <div>
@@ -463,15 +449,6 @@ function OldEnglish({
     const client = createClient({
       url: APIURL
     })  
-    
-
-/*     const purchasePrice = {
-      tokenAddress: ETH_ADDRESS_AS_ERC20, 
-      amount: "1000000000000000",
-      type: 'ERC20'
-    }      
-   */
- /* const caporder = [0, "0x806164c929ad3a6f4bd70c2370b3ef36c64deaa8", "0x0000000000000000000000000000000000000000", "2524604400", "100131415900000000000000000000000000000278871891236123933663926623449196810869", "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", "1000000000000000", [], "0xa4248ac1a4fc557134802f39cddf830fde6dda06", "1", []] */
 
     return(
       <div>
@@ -503,12 +480,6 @@ function OldEnglish({
                 walletAddressUserB
                 ));
               }
-              
-/*               const reconstructedOnchainOrder = 
-    //testorder              
-              [
-                [0, "0x806164c929ad3a6f4bd70c2370b3ef36c64deaa8", "0x0000000000000000000000000000000000000000", "2524604400", "100131415900000000000000000000000000000278871891236123933663926623449196810869", "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", "1000000000000000", [], "0xa4248ac1a4fc557134802f39cddf830fde6dda06", "1", []]                
-              ] */
 
               const reconstructedOnchainOrder = [
                 subgraphQuery.data.erc721Orders[0].direction, // trade direction (0 = sell, 1 = buy)
@@ -572,79 +543,6 @@ function OldEnglish({
       </div>
     )
   }
-
-  const marketplaceManager = () => {
-    const [transferHelper, setTransferHelper] = useState(false);
-    const [moduleManager, setModuleManager] = useState(false);
-
-    return (
-      <div className="approvalPopOverManager">
-        <div className="pleaseApprovePopover">
-          Lost & Found is built on the ZORA marketplace protocol. Please sign the following approvals to allow the protocol to interact with your assets : {/* ↓ ↓ */}
-        </div>
-        {erc721TransferHelperApproved == true ? (
-          <div
-            className="erc721ApprovedPopover"
-            style={{  }}>
-            NFT TRANSFER HELPER IS APPROVED ✅
-          </div>
-          ) : (
-          <Button
-          className="erc721ApprovalButtonPopover"   
-          style= {{ backgroundColor: "#d87456", color: "#791600", border: "4px solid #791600", fontSize: "1rem", height: "auto", borderRadius: 20  }}
-            type="primary"
-            loading={transferHelper}
-            onClick={async () => {
-              setTransferHelper(true);
-              try {
-                const txCur = await tx(writeContracts[lostandfoundNFTContract].setApprovalForAll(
-                  mainnetZoraAddresses.ERC721TransferHelper,
-                  true
-                ));
-                await txCur.wait();
-                updateOneOldEnglish();
-                setTransferHelper(false);
-              } catch (e) {
-                console.log("ERC721Transfer HelperApproval Failed", e);
-                setTransferHelper(false);
-              }
-            }}
-          >            
-            APPROVE NFT TRANSFER HELPER
-          </Button>
-          )}
-          {zoraModuleManagerApproved == true ? (
-          <div className="zmmApprovedPopover">
-            MARKETPLACE PROTOCOL IS APPROVED ✅ 
-          </div>              
-          ) : (
-          <Button
-            className="zmmApprovalButtonPopover"
-            style={{ backgroundColor: "#4998ff", color: "#283cc4", border: "4px solid #283cc4", fontSize: "1rem", height: "auto", borderRadius: 20, verticalAlign: "center" }}
-            type="primary"
-            loading={moduleManager}
-            onClick={async () => {
-              setModuleManager(true);
-              try {
-                const txCur = await tx(writeContracts[zmmContract].setApprovalForModule(
-                  mainnetZoraAddresses.AsksV1_1, 
-                  true
-                ));
-                await txCur.wait();
-                updateOneOldEnglish();
-                setModuleManager(false);
-              } catch (e) {
-                console.log("ZORA Module Manager Approval Failed", e);
-                setModuleManager(false);
-              }
-            }}
-          >      
-            APPROVE MARKETPLACE PROTOCOL
-          </Button>
-          )}
-      </div>
-    )
-  }  
 
   return (
     <div className="OldEnglish">
@@ -757,9 +655,7 @@ function OldEnglish({
                       target="_blank"
                     >
                       <img className="nftImage" src={imageWithGateway && imageWithGateway} alt={"LF #" + id} width="100%" />
-                    </a>
-
-                    
+                    </a>                  
                     <div className="cardFooters">
                       {item.orderData.length == 0 ? ( // sale = inactive
                         <div className="activityWrapper">
