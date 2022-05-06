@@ -68,54 +68,155 @@ function OldEnglish({
   };
 
   //=====FUNCTIONALITY ADDITION
+  
+  const fetchZeroExOrderData = async id => {
+
+    const tokensQuery = `
+    query {
+      erc721Orders(
+        where: {erc721Token: "${lostandfoundNFTContractAddress}", erc721TokenId: "${id}" }
+        orderBy: timestamp
+        orderDirection: desc
+      ) {
+        direction
+        maker
+        taker
+        expiry
+        nonce
+        erc20Token
+        erc20TokenAmount
+        fees {
+          id
+        }
+        erc721Token
+        erc721TokenId
+        erc721TokenProperties {
+          id
+        }
+        timestamp
+        blockNumber
+      }
+    }
+  `      
+
+    const client = createClient({
+      url: APIURL
+    })
+
+    const subgraphQuery =  await client.query(tokensQuery).toPromise();
+    console.log("subgraph query", subgraphQuery);  
+
+    let orderToCheck = subgraphQuery.data.erc721Orders.length; // if this equals 0 for a specific nft id, means there is no active listing
+    console.log(id, "order to check", orderToCheck);
+
+    const currentOrderMetadata = []; // sets metadata to empty before going into checks to see if it is live
+    console.log("currentORderMetadata before chec: ", currentOrderMetadata)
+
+    if (orderToCheck > 0 ) {
+      const orderStatus = await readContracts[zeroExErc721StatusContract].getERC721OrderStatus([
+        subgraphQuery.data.erc721Orders[0].direction, // trade direction (0 = sell, 1 = buy)
+        subgraphQuery.data.erc721Orders[0].maker, // maker address
+        subgraphQuery.data.erc721Orders[0].taker, // taker address 
+        subgraphQuery.data.erc721Orders[0].expiry, // expiry from creation of original order?
+        subgraphQuery.data.erc721Orders[0].nonce, // nonce
+        subgraphQuery.data.erc721Orders[0].erc20Token, // erc20token
+        subgraphQuery.data.erc721Orders[0].erc20TokenAmount,//BigNumber.from(subgraphQuery.data.erc721Orders[0].erc20TokenAmount).toString(), // erc20 token amount (hardhcoded to 0.01 eth)
+        [], // fees (none included atm)
+        subgraphQuery.data.erc721Orders[0].erc721Token, // erc721 nft contract
+        subgraphQuery.data.erc721Orders[0].erc721TokenId, // erc721 nft contract token id
+        [] // erc721 token properties (none included atm)
+      ])
+      console.log("orderStatus", orderStatus);
+      if (orderStatus == 1 ) {
+        let currentOrderMetadata = [
+          subgraphQuery.data.erc721Orders[0].direction, // trade direction (0 = sell, 1 = buy)
+          subgraphQuery.data.erc721Orders[0].maker, // maker address
+          subgraphQuery.data.erc721Orders[0].taker, // taker address 
+          subgraphQuery.data.erc721Orders[0].expiry, // expiry from creation of original order?
+          subgraphQuery.data.erc721Orders[0].nonce, // nonce
+          subgraphQuery.data.erc721Orders[0].erc20Token, // erc20token
+          subgraphQuery.data.erc721Orders[0].erc20TokenAmount,//BigNumber.from(subgraphQuery.data.erc721Orders[0].erc20TokenAmount).toString(), // erc20 token amount (hardhcoded to 0.01 eth)
+          [], // fees (none included atm)
+          subgraphQuery.data.erc721Orders[0].erc721Token, // erc721 nft contract
+          subgraphQuery.data.erc721Orders[0].erc721TokenId, // erc721 nft contract token id
+          [] // erc721 token properties (none included atm)      
+        ]
+        console.log("currentorderMetadata after check: ", currentOrderMetadata);
+        console.log("length of currentmetadata array", currentOrderMetadata.length)
+        return currentOrderMetadata   
+      }
+    } return currentOrderMetadata
+  }
+  
+  
   const fetchMetadataAndUpdate = async id => {
+
     try {
+      // console.log("did subgraphmetadata persist")
       const tokenURI = await readContracts[lostandfoundNFTContract].tokenURI(id);
       const nftMetadataURL = "https://ipfs.io/ipfs/" + tokenURI.substring(7); 
       const nftMetadataFetch = await fetch(nftMetadataURL); 
 
+      const ownerAddress = await readContracts[lostandfoundNFTContract].ownerOf(id);
+      const ownerAddressCleaned = ownerAddress.toString().toLowerCase();
+
       //===== CUSTOM UPDATE
       const seller = {seller: '0x0000000000000000000000000000000000000000', sellerFundsRecipient: '0x0000000000000000000000000000000000000000', askCurrency: '0x0000000000000000000000000000000000000000', findersFeeBps: 0, askPrice: BigNumber} ;
 
-      const tokensQuery = `
-        query {
-          erc721Orders(
-            where: {erc721Token: "${lostandfoundNFTContractAddress}", erc721TokenId: "${id}" }
-            orderBy: timestamp
-            orderDirection: desc
-          ) {
-            direction
-            maker
-            taker
-            expiry
-            nonce
-            erc20Token
-            erc20TokenAmount
-            fees {
-              id
-            }
-            erc721Token
-            erc721TokenId
-            erc721TokenProperties {
-              id
-            }
-            timestamp
-            blockNumber
-          }
-        }
-      `      
+      const currentOrderData = await fetchZeroExOrderData(id);
 
-    const client = createClient({
-      url: APIURL
-    })  
+ /*      const orderStatus = await readContracts[zeroExErc721StatusContract].getERC721OrderStatus([
+        subgraphQuery.data.erc721Orders[0].direction, // trade direction (0 = sell, 1 = buy)
+        subgraphQuery.data.erc721Orders[0].maker, // maker address
+        subgraphQuery.data.erc721Orders[0].taker, // taker address 
+        subgraphQuery.data.erc721Orders[0].expiry, // expiry from creation of original order?
+        // subgraphQuery.data.erc721Orders[0].nonce, // nonce
+        subgraphQuery.data.erc721Orders[0].erc20Token, // erc20token
+        //BigNumber.from(subgraphQuery.data.erc721Orders[0].erc20TokenAmount).toString(), // erc20 token amount (hardhcoded to 0.01 eth)
+        [], // fees (none included atm)
+        subgraphQuery.data.erc721Orders[0].erc721Token, // erc721 nft contract
+        subgraphQuery.data.erc721Orders[0].erc721tokenId, // erc721 nft contract token id
+        [] // erc721 token properties (none included atm)
+      ])
+      console.log("orderStatus", orderStatus) */
 
-    const subgraphQuery =  await client.query(tokensQuery).toPromise();
-    console.log("subgraph query", subgraphQuery);
+/*     if (orderToCheck > & ) {
+      const orderStatus = await readContracts[zeroExErc721StatusContract].getERC721OrderStatus([
+        subgraphQuery.data.erc721Orders[0].direction, // trade direction (0 = sell, 1 = buy)
+        subgraphQuery.data.erc721Orders[0].maker, // maker address
+        subgraphQuery.data.erc721Orders[0].taker, // taker address 
+        subgraphQuery.data.erc721Orders[0].expiry, // expiry from creation of original order?
+        subgraphQuery.data.erc721Orders[0].nonce, // nonce
+        subgraphQuery.data.erc721Orders[0].erc20Token, // erc20token
+        //BigNumber.from(subgraphQuery.data.erc721Orders[0].erc20TokenAmount).toString(), // erc20 token amount (hardhcoded to 0.01 eth)
+        [], // fees (none included atm)
+        subgraphQuery.data.erc721Orders[0].erc721Token, // erc721 nft contract
+        subgraphQuery.data.erc721Orders[0].erc721tokenId, // erc721 nft contract token id
+        [] // erc721 token properties (none included atm)
+      ])
+      console.log("orderStatus", orderStatus);
+      if (orderStatus == 1 ) {
+        let currentOrderMetadata = [
+          subgraphQuery.data.erc721Orders[0].direction, // trade direction (0 = sell, 1 = buy)
+          subgraphQuery.data.erc721Orders[0].maker, // maker address
+          subgraphQuery.data.erc721Orders[0].taker, // taker address 
+          subgraphQuery.data.erc721Orders[0].expiry, // expiry from creation of original order?
+          subgraphQuery.data.erc721Orders[0].nonce, // nonce
+          subgraphQuery.data.erc721Orders[0].erc20Token, // erc20token
+          //BigNumber.from(subgraphQuery.data.erc721Orders[0].erc20TokenAmount).toString(), // erc20 token amount (hardhcoded to 0.01 eth)
+          [], // fees (none included atm)
+          subgraphQuery.data.erc721Orders[0].erc721Token, // erc721 nft contract
+          subgraphQuery.data.erc721Orders[0].erc721tokenId, // erc721 nft contract token id
+          [] // erc721 token properties (none included atm)          
+        ]
+        console.log("currentorderMetadat", currentOrderMetadata);
+        console.log("length of currentmetadata array", currentOrderMetadata.length)
+         return currentOrderMetadata   
+      }
+    } */
 
-    let orderToCheck = subgraphQuery.data.erc721Orders.length; // if this equals 0 for a specific nft id, means there is no active listing
-    console.log(id, "order to check", orderToCheck);
-    
-    if (orderToCheck == 0) {
+
+/*     if (orderToCheck == 1) {
       const currentOrderMetadata = [] // length of zero signifies no active order because no order history for given token      
       console.log("currentorderMetadata", currentOrderMetadata);
       console.log("length of currentmetadata array", currentOrderMetadata.length)
@@ -128,7 +229,7 @@ function OldEnglish({
         subgraphQuery.data.erc721Orders[0].expiry, // expiry from creation of original order?
         subgraphQuery.data.erc721Orders[0].nonce, // nonce
         subgraphQuery.data.erc721Orders[0].erc20Token, // erc20token
-        /* BigNumber.from(subgraphQuery.data.erc721Orders[0].erc20TokenAmount).toString(), // erc20 token amount (hardhcoded to 0.01 eth) */
+        //BigNumber.from(subgraphQuery.data.erc721Orders[0].erc20TokenAmount).toString(), // erc20 token amount (hardhcoded to 0.01 eth)
         [], // fees (none included atm)
         subgraphQuery.data.erc721Orders[0].erc721Token, // erc721 nft contract
         subgraphQuery.data.erc721Orders[0].erc721tokenId, // erc721 nft contract token id
@@ -147,28 +248,23 @@ function OldEnglish({
           subgraphQuery.data.erc721Orders[0].expiry, // expiry from creation of original order?
           subgraphQuery.data.erc721Orders[0].nonce, // nonce
           subgraphQuery.data.erc721Orders[0].erc20Token, // erc20token
-          /* BigNumber.from(subgraphQuery.data.erc721Orders[0].erc20TokenAmount).toString(), // erc20 token amount (hardhcoded to 0.01 eth) */
+          //BigNumber.from(subgraphQuery.data.erc721Orders[0].erc20TokenAmount).toString(), // erc20 token amount (hardhcoded to 0.01 eth)
           [], // fees (none included atm)
           subgraphQuery.data.erc721Orders[0].erc721Token, // erc721 nft contract
           subgraphQuery.data.erc721Orders[0].erc721tokenId, // erc721 nft contract token id
           [] // erc721 token properties (none included atm)          
-        ]      
+        ]    
       } 
-    } 
-    
+    }  */
 
-      const ownerAddress = await readContracts[lostandfoundNFTContract].ownerOf(id);
-      const ownerAddressCleaned = ownerAddress.toString().toLowerCase();
-      //===== CUSTOM UPDATE
-
-      try {
+      try {        
         const nftMetadataObject = await nftMetadataFetch.json();
         const collectibleUpdate = {};
 
      /*    console.log(nftMetadataObject); */
 
         //===== CUSTOM UPDATE, added askSeller: seller and nftOwner: ownerAddress as key:value pairs
-        collectibleUpdate[id] = { id: id, uri: tokenURI, orderStatus: orderToCheck, orderMetadata: currentOrderMetadata, askSeller: seller, nftOwner: ownerAddressCleaned, ...nftMetadataObject};
+        collectibleUpdate[id] = { id: id, uri: tokenURI, orderData: currentOrderData, askSeller: seller, nftOwner: ownerAddressCleaned, ...nftMetadataObject};
         console.log("collectible update", collectibleUpdate);
   /*       console.log("order status ", orderStatus) */
         //====== CUSTOM UPDATE
