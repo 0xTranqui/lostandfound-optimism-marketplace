@@ -25,7 +25,7 @@ export const NETWORKS = {
     name: "optimism",
     color: "#f01a37",
     chainId: 10,
-    blockExplorer: "https://optimistic.etherscan.io/",
+    blockExplorer: `https://opt-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`,
     rpcUrl: `https://mainnet.optimism.io`,
   },
   mainnet: {
