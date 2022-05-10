@@ -43,13 +43,13 @@ This allows the constants.js file in the react-app/src directory to pull these k
 Navigate to + expand the the packages directory, and then right click on the hardhat folder and create a new file. Name this file ".env"
 Add in the following 6 lines of code (the mainnet lines are optional) :
 ```
-RINKEBY_ALCHEMY_KEY = enter your key here (without quotes)
-RINKEBY_ETHERSCAN_API_KEY = enter your key here (without quotes)
-RINKEBY_DEPLOYER_PRIV_KEY = enter your key here (without quotes)
+ROPSTEN_ALCHEMY_KEY = enter your key here (without quotes)
+ROPSTEN_ETHERSCAN_API_KEY = enter your key here (without quotes)
+ROPSTEN_DEPLOYER_PRIV_KEY = enter your key here (without quotes)
 
-MAINNET_ALCHEMY_KEY = enter your key here (without quotes)
-MAINNET_ETHERSCAN_API_KEY = enter your key here (without quotes)
-MAINNET_DEPLOYER_PRIV_KEY = enter your key here (without quotes)
+OPTIMISM_ALCHEMY_KEY = enter your key here (without quotes)
+OPTIMISM_ETHERSCAN_API_KEY = enter your key here (without quotes)
+OPTIMISM_DEPLOYER_PRIV_KEY = enter your key here (without quotes)
 ```
 This allows the hardhat.config.js file in the packages/hardhat directory to use these keys for the smart contract deployment and 
 verification functionality we will be implementing without having to expose them publicly.
