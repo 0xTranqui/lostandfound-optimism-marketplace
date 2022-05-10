@@ -54,6 +54,34 @@ OPTIMISM_DEPLOYER_PRIV_KEY = enter your key here (without quotes)
 This allows the hardhat.config.js file in the packages/hardhat directory to use these keys for the smart contract deployment and 
 verification functionality we will be implementing without having to expose them publicly.
 
+## Setting Up the Front End
+
+From here, you can now run the following code to interact with your own local frontend that points at the existing Lost & Found marketplace located at   https://www.lostfound.world/. Note: it won't work unless you have set up the .env in pacakges/react-app. All you have to do is run the following from the root level of the project directory:
+```
+cd lostandfound-zora-marketplace
+yarn start
+```
+
+You now have a direct window into the Lost & Found marketplace! You'll notice that the app points at Optimism if you look at the top
+right corner of the site, where the network the app is pointed at is listed. Both the NFT contract and 0x marketplace protocols live on
+Optimism as well. You are "yarn-starting" into a production ready app!
+
+We'll come back to learning how to edit the front end, but first lets reconfigure the app so that it points at ropsten which is a more 
+suitable environment for testing
+
+### App.jsx Updates (packages/react-app/src/App.jsx)
+
+- Line 58: Replace "optimism" with "ropsten"
+- Line 73: Replace "lostandFoundOptimism" with "lostandFoundContract4"
+- Line 74: Replace "0xa4248aC1a4Fc557134802f39cddF830Fde6DdA06" with "0x9fd7ad2ecf7510eddcf0e6a345188d9df23805ac"
+- Line 76: Replace "zeroExErc721StatusOPTIMISM" with "zeroExErc721OrdersFeatureROPSTEN"
+
+### OldEnglish.jsx Updates (packages/react-app/src/views/OldEnglish.jsx)
+
+- Line 13: Change the subgraph APIURL from optimism link: 'https://api.thegraph.com/subgraphs/name/0xtranqui/zeroex-nft-swap-v4-optimism-v4' to ropsten link: 'https://api.thegraph.com/subgraphs/name/0xtranqui/zeroex-nft-swap-v4-ropsten-v2'
+
+When you press save (on both files) to run this code, you will get a pop up on the site that alerts you that you are on the wrong network and you
+need to switch to rinkeby to continue using the app. Follow those instructions :) (your screenshot will say rinkeby instead of mainnet)
 
 *** FINAL SECTIONS IN PROGRESS :) ***
 

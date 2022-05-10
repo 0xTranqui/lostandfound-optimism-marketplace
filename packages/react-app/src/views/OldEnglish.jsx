@@ -5,13 +5,13 @@ import { ethers, BigNumber } from "ethers";
 
 //========== MY CUSTOM IMPORTS
 import "./Marketplace.css";
-import LF_Logo_V2_5 from "./LF_Logo_V2_5.png";
 import LF_Logo_Blueprint from "./LF_Logo_Blueprint_0x.png";
 import { NftSwapV4, ETH_ADDRESS_AS_ERC20 } from '@traderxyz/nft-swap-sdk';
 import { createClient } from 'urql';
 //========== MY CUSTOM IMPORTS
 
 const APIURL = 'https://api.thegraph.com/subgraphs/name/0xtranqui/zeroex-nft-swap-v4-optimism-v4';
+// link for ropsten subgraph: https://api.thegraph.com/subgraphs/name/0xtranqui/zeroex-nft-swap-v4-ropsten-v2
 
 function OldEnglish({
   readContracts,

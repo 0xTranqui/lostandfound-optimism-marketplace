@@ -26,7 +26,6 @@ import { OldEnglish, Mint, About, Test } from "./views";
 import { useStaticJsonRPC } from "./hooks";
 
 //====MY CUSTOM IMPORTS
-import mainnetZoraAddresses from "@zoralabs/v3/dist/addresses/3.json";
 import linedPaperBackground from "./graph_paper_background_0x.png";
 //====MY CUSTOM IMPORTS
 
@@ -62,8 +61,7 @@ const web3Modal = Web3ModalSetup();
 
 // 🛰 providers
 const providers = [
-  "https://eth-mainnet.gateway.pokt.network/v1/lb/611156b4a585a20035148406",
-  `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_KEY}`,
+  `https://opt-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`,
   "https://rpc.scaffoldeth.io:48544",
 ];
 
