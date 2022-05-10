@@ -316,8 +316,8 @@ module.exports = {
     },
   },
   etherscan: {
-    apiKey: process.env.OPTIMISM_ETHERSCAN_API_KEY
-  },
+    apiKey: process.env.OPTIMISM_ETHERSCAN_API_KEY,
+  }
 };
 
 const DEBUG = false;
