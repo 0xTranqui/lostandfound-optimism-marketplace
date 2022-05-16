@@ -12,6 +12,16 @@ import { createClient } from 'urql';
 
 const APIURL = 'https://api.thegraph.com/subgraphs/name/0xtranqui/zeroex-nft-swap-v4-optimism-v4';
 // link for ropsten subgraph: https://api.thegraph.com/subgraphs/name/0xtranqui/zeroex-nft-swap-v4-ropsten-v2
+// link for optimism subgraph: 'https://api.thegraph.com/subgraphs/name/0xtranqui/zeroex-nft-swap-v4-optimism-v4'
+
+
+// ========== CREATE ORDER ARTIST ROYALTY CONSTANTS ==========
+const artistRoyalty = 0.150000000000000000; // this value will get passed into the create order flow
+// specify total royalty % going to artists on each sale (use 18 decimals ending in trailing zeroes to avoid underflow caused by rounding)
+// if you change numberofRoyaltyPayoutRecipients from 2, you will have to adjust the fee objects on line 293 
+const numberOfRoyaltyPayoutRecipients = 2; // specify number of recipients who will be splitting royalty
+
+
 
 function OldEnglish({
   readContracts,
@@ -36,59 +46,38 @@ function OldEnglish({
   const [loadingOldEnglish, setLoadingOldEnglish] = useState(true);
   const perPage = 12;
   const [page, setPage] = useState(0);
-
-  //===CUSTOM STATE SETTING TO HANDLE FINDERS FEE FORM INPUT LOGIC
-  const [createFinderIsDisabled, setCreateFinderIsDisabled] = useState(true);
-  
-  const createHandleClickFalse = () => {
-    setCreateFinderIsDisabled(false)
-  };
-
-  const createHandleClickTrue = () => {
-    setCreateFinderIsDisabled(true)
-  };
-
-  const [fillFinderIsDisabled, setFillFinderIsDisabled] = useState(true);
-  
-  const fillHandleClickFalse = () => {
-    setFillFinderIsDisabled(false)
-  };
-
-  const fillHandleClickTrue = () => {
-    setFillFinderIsDisabled(true)
-  };
-
-  //=====FUNCTIONALITY ADDITION
   
   const fetchZeroExOrderData = async id => {
 
     const tokensQuery = `
-    query {
-      erc721Orders(
-        where: {erc721Token: "${lostandfoundNFTContractAddress}", erc721TokenId: "${id}" }
-        orderBy: timestamp
-        orderDirection: desc
-      ) {
-        direction
-        maker
-        taker
-        expiry
-        nonce
-        erc20Token
-        erc20TokenAmount
-        fees {
-          id
+      query {
+        erc721Orders(
+          where: {erc721Token: "${lostandfoundNFTContractAddress}", erc721TokenId: "${id}" }
+          orderBy: timestamp
+          orderDirection: desc
+        ) {
+          direction
+          maker
+          taker
+          expiry
+          nonce
+          erc20Token
+          erc20TokenAmount
+          fees {
+            amount
+            feeData
+            recipient
+          }
+          erc721Token
+          erc721TokenId
+          erc721TokenProperties {
+            id
+          }
+          timestamp
+          blockNumber
         }
-        erc721Token
-        erc721TokenId
-        erc721TokenProperties {
-          id
-        }
-        timestamp
-        blockNumber
       }
-    }
-  `      
+    ` 
 
     const client = createClient({
       url: APIURL
@@ -112,7 +101,7 @@ function OldEnglish({
         subgraphQuery.data.erc721Orders[0].nonce, // nonce
         subgraphQuery.data.erc721Orders[0].erc20Token, // erc20token
         subgraphQuery.data.erc721Orders[0].erc20TokenAmount, // erc20 token amount (hardhcoded to 0.01 eth)
-        [], // fees (none included atm)
+        subgraphQuery.data.erc721Orders[0].fees, // fees
         subgraphQuery.data.erc721Orders[0].erc721Token, // erc721 nft contract
         subgraphQuery.data.erc721Orders[0].erc721TokenId, // erc721 nft contract token id
         [] // erc721 token properties (none included atm)
@@ -127,7 +116,7 @@ function OldEnglish({
           subgraphQuery.data.erc721Orders[0].nonce, // nonce
           subgraphQuery.data.erc721Orders[0].erc20Token, // erc20token
           subgraphQuery.data.erc721Orders[0].erc20TokenAmount, // erc20 token amount (hardhcoded to 0.01 eth)
-          [], // fees (none included atm)
+          subgraphQuery.data.erc721Orders[0].fees, // fees
           subgraphQuery.data.erc721Orders[0].erc721Token, // erc721 nft contract
           subgraphQuery.data.erc721Orders[0].erc721TokenId, // erc721 nft contract token id
           [] // erc721 token properties (none included atm)      
@@ -256,6 +245,10 @@ function OldEnglish({
           }}
           onFinish={async values => {
             setListing(true);
+            const listingPriceAfterRoyalty = (values["listingPrice"] * (1 - artistRoyalty)).toString();
+            const artistRoyaltyShare = (values["listingPrice"] * (artistRoyalty / numberOfRoyaltyPayoutRecipients)).toString();            
+            console.log("listingpriceafterroyalty: ", listingPriceAfterRoyalty);
+            console.log("artistRoyaltyShare: ", artistRoyaltyShare);
             try {
               const approvalStatusForUserA = await nftSwapSdk.loadApprovalStatus(
                 nftToSwapUserA,
@@ -275,13 +268,27 @@ function OldEnglish({
                 nftToSwapUserA,
                 {
                   tokenAddress: ETH_ADDRESS_AS_ERC20,
-                  amount: ethers.utils.parseUnits(values["listingPrice"], 'ether').toString(),
+                  amount: ethers.utils.parseUnits(listingPriceAfterRoyalty, 'ether').toString(), // % of total list price going to recipient address upon sale
                   type: 'ERC20'
                 },
-                walletAddressUserA
+                walletAddressUserA,
+                {
+                  fees: [
+                    // insert/remove number of fee objects to match the value you set for numberOfRoyaltyPayoutRecipients on line 243
+                    {
+                      amount: ethers.utils.parseUnits(artistRoyaltyShare, 'ether').toString(), 
+                      recipient: '0x45bb50734c961b1629b5bb70a4a7a3b3d3c4852a', // fee recipient 1
+                    },
+                    {
+                      amount: ethers.utils.parseUnits(artistRoyaltyShare, 'ether').toString(),
+                      recipient: '0x806164c929ad3a6f4bd70c2370b3ef36c64deaa8', // fee recipient 2 
+                    },
+                  ],
+                }                
               );
               const txCur2 = await tx(nftSwapSdk.exchangeProxy.preSignERC721Order(order)); 
               await txCur2.wait();
+              fetchMetadataAndUpdate(id);
               setListing(false);
             } catch (e) {
               console.log("create order failed", e)
@@ -324,9 +331,10 @@ function OldEnglish({
   const cancelOrder = id => {
     const [cancel, setCancel] = useState(false);
 
+    /* commented out as flow used doesn't follow contract flow specified in trader-sdk
     const CHAIN_ID = userSigner.provider._network && userSigner.provider._network.chainId; // 3 = ropsten, 10 = optimism
-
     const nftSwapSdk = new NftSwapV4(localProvider, userSigner, CHAIN_ID);
+    */
 
     const tokensQuery = `
       query {
@@ -343,7 +351,9 @@ function OldEnglish({
           erc20Token
           erc20TokenAmount
           fees {
-            id
+            amount
+            feeData
+            recipient
           }
           erc721Token
           erc721TokenId
@@ -376,6 +386,7 @@ function OldEnglish({
               const txCur = await tx(writeContracts[zeroExErc721StatusContract].cancelERC721Order(orderNonceToCancel));
               /* const txCur = await tx(nftSwapSdk.exchangeproxy.cancelERC721Order(orderNonceToCancel)); original call to make following sdk, doesn't work tho    */      
               await txCur.wait();
+              fetchMetadataAndUpdate(id);
               setCancel(false);
             } catch (e) {
               console.log("CANCEL ORDER FAILED", e);
@@ -403,7 +414,7 @@ function OldEnglish({
 
     const [fillOrderForm] = Form.useForm();
     const fillOrder = id => {
-/*       const [fill, setFill] = useState(false); */
+      const [fill, setFill] = useState(false);
 
       const CHAIN_ID = userSigner.provider._network && userSigner.provider._network.chainId;
       
@@ -419,32 +430,34 @@ function OldEnglish({
       const nftToSwapUserB = lostandfoundSpecificNFT;  
 
       const tokensQuery = `
-        query {
-          erc721Orders(
-            where: {erc721Token: "${lostandfoundNFTContractAddress}", erc721TokenId: "${id}" }
-            orderBy: timestamp
-            orderDirection: desc
-          ) {
-            direction
-            maker
-            taker
-            expiry
-            nonce
-            erc20Token
-            erc20TokenAmount
-            fees {
-              id
-            }
-            erc721Token
-            erc721TokenId
-            erc721TokenProperties {
-              id
-            }
-            timestamp
-            blockNumber
+      query {
+        erc721Orders(
+          where: {erc721Token: "${lostandfoundNFTContractAddress}", erc721TokenId: "${id}" }
+          orderBy: timestamp
+          orderDirection: desc
+        ) {
+          direction
+          maker
+          taker
+          expiry
+          nonce
+          erc20Token
+          erc20TokenAmount
+          fees {
+            amount
+            feeData
+            recipient
           }
+          erc721Token
+          erc721TokenId
+          erc721TokenProperties {
+            id
+          }
+          timestamp
+          blockNumber
         }
-      `  
+      }
+    `
 
     const client = createClient({
       url: APIURL
@@ -457,13 +470,15 @@ function OldEnglish({
           form={fillOrderForm}
           name="fill order"
           onFinish={async values => {
-/*             setFill(true); */
-            const subgraphQuery =  await client.query(tokensQuery).toPromise();
-            const orderPrice = subgraphQuery.data.erc721Orders[0].erc20TokenAmount;
+            setFill(true);
+            const subgraphQuery =  await client.query(tokensQuery).toPromise();          
+            const totalMsgValueToSend = (Number(subgraphQuery.data.erc721Orders[0].erc20TokenAmount) + 
+            Number(subgraphQuery.data.erc721Orders[0].fees[0].amount) + 
+            Number(subgraphQuery.data.erc721Orders[0].fees[1].amount)).toString();
             console.log("entire query: ", subgraphQuery);
             const PurchasePrice = {
               tokenAddress: ETH_ADDRESS_AS_ERC20, 
-              amount: subgraphQuery.data.erc721Orders[0].erc20TokenAmount,
+              amount: totalMsgValueToSend,
               type: 'ERC20'
             }
             try {
@@ -489,7 +504,7 @@ function OldEnglish({
                 subgraphQuery.data.erc721Orders[0].nonce, // nonce
                 subgraphQuery.data.erc721Orders[0].erc20Token, // erc20token
                 subgraphQuery.data.erc721Orders[0].erc20TokenAmount, // erc20 token amount (hardhcoded to 0.01 eth)
-                [], // fees (none included atm)
+                subgraphQuery.data.erc721Orders[0].fees, // fees
                 subgraphQuery.data.erc721Orders[0].erc721Token, // erc721 nft contract
                 subgraphQuery.data.erc721Orders[0].erc721TokenId, // erc721 nft contract token id
                 [] // erc721 token properties (none included atm)
@@ -508,7 +523,7 @@ function OldEnglish({
                 reconstructedOnchainOrder,
                 nullSignatureStruct,
                 "0x",
-                { value: BigNumber.from(subgraphQuery.data.erc721Orders[0].erc20TokenAmount).toString() }
+                { value: BigNumber.from(totalMsgValueToSend).toString()}
               )
 
 /*            
@@ -521,10 +536,11 @@ function OldEnglish({
               )
  */
               await txCur2.wait();
-/*               setFill(false); */
+              fetchMetadataAndUpdate(id);
+              setFill(false);
             } catch (e) {
               console.log("fill order failed", e)
-/*               setFill(false); */
+              setFill(false);
             }         
           }}
           onFinishFailed={onFinishFailed}
@@ -534,7 +550,7 @@ function OldEnglish({
             style={{ backgroundColor: "#e26843", color: "#791600", border: "4px solid #791600", fontSize: "1.25rem", height: "auto", borderRadius: 20  }} 
             type="primary"
             htmlType="submit"
-/*             loading={fill} */
+            loading={fill}
             >
             BUY
             </Button>
@@ -676,7 +692,7 @@ function OldEnglish({
                             PRICE : N/A
                             </div>
                             <div className="listingFindersFee">
-                            ARTIST ROYALTY : 15%
+                            ARTIST ROYALTY : {artistRoyalty * 100} %
                             </div>
                           </div>                         
                           { item.nftOwner == address.toLowerCase() ? ( // listing inactive  &  app user is owner
@@ -724,10 +740,14 @@ function OldEnglish({
                             LISTING : ACTIVE
                             </div>
                             <div className="listingPrice">
-                            PRICE : {"" + ( item.orderData[6] / (10 ** 18)) + " ETH"}
+                            PRICE : {"" + ( 
+                              ((item.orderData[6]) / (10 ** 18)) + 
+                              ((item.orderData[7][0].amount) / (10 ** 18)) + 
+                              ((item.orderData[7][1].amount) / (10 ** 18)) ).toFixed(0) + 
+                              " ETH"}
                             </div>
                             <div className="listingFindersFee">
-                            ARTIST ROYALTY : 15%
+                            ARTIST ROYALTY : {artistRoyalty * 100} %
                             </div>
                           </div>                         
                           { item.nftOwner == address.toLowerCase() ? ( // listing active  &  app user is owner

@@ -86,7 +86,7 @@ module.exports = {
       accounts: [`${process.env.MAINNET_DEPLOYER_PRIV_KEY}`],
     }, */
 /*     ropsten: {
-      url: `https://eth-ropsten.alchemyapi.io/v2/${process.env.RINKEBY_ALCHEMY_KEY}`,
+      url: `https://eth-ropsten.alchemyapi.io/v2/${process.env.ROPSTEN_ALCHEMY_KEY}`,
       accounts: [`${process.env.ROPSTEN_DEPLOYER_PRIV_KEY}`],
     }, */
     // goerli: {

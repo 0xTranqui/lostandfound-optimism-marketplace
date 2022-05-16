@@ -7,7 +7,7 @@ import {
   useGasPrice,
   useUserProviderAndSigner
 } from "eth-hooks";
-import { useExchangeEthPrice } from "eth-hooks/dapps/dex";
+/* import { useExchangeEthPrice } from "eth-hooks/dapps/dex"; */
 import React, { useCallback, useEffect, useState } from "react";
 import { Link, Route, Switch, useLocation } from "react-router-dom";
 import "./App.css";
@@ -49,8 +49,6 @@ const { ethers } = require("ethers");
     (and then use the `useExternalContractLoader()` hook!)
 */
 
-
-
 // 😬 Sorry for all the console logging
 const DEBUG = true;
 const NETWORKCHECK = true;
@@ -71,7 +69,6 @@ function App(props) {
   //======my custom additions
   const lostandfoundNFTContract = "lostandFoundOptimism"; // update address of lostandFoundContract2 if redeploying an identical nft contract for testing purposes
   const lostandfoundNFTContractAddress = "0xa4248aC1a4Fc557134802f39cddF830Fde6DdA06"; // change this to the nft contract you want to be interacting with
-  
   const zeroExErc721StatusContract = "zeroExErc721StatusOPTIMISM";
   //======my custom additions
 
@@ -106,7 +103,7 @@ function App(props) {
   };
 
   /* 💵 This hook will get the price of ETH from 🦄 Uniswap: */
-  const price = useExchangeEthPrice(targetNetwork, mainnetProvider);
+/*   const price = useExchangeEthPrice(targetNetwork, mainnetProvider); */
 
   /* 🔥 This hook will get the price of Gas from ⛽️ EtherGasStation */
   const gasPrice = useGasPrice(targetNetwork, "fast");
@@ -274,7 +271,7 @@ function App(props) {
             localProvider={localProvider}
             userSigner={userSigner}
             mainnetProvider={mainnetProvider}
-            price={price}
+            /* price={price} */
             web3Modal={web3Modal}
             loadWeb3Modal={loadWeb3Modal}
             logoutOfWeb3Modal={logoutOfWeb3Modal}
