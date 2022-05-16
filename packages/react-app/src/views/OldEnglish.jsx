@@ -18,10 +18,13 @@ const APIURL = 'https://api.thegraph.com/subgraphs/name/0xtranqui/zeroex-nft-swa
 // ========== CREATE ORDER ARTIST ROYALTY CONSTANTS ==========
 const artistRoyalty = 0.150000000000000000; // this value will get passed into the create order flow
 // specify total royalty % going to artists on each sale (use 18 decimals ending in trailing zeroes to avoid underflow caused by rounding)
-// if you change numberofRoyaltyPayoutRecipients from 2, you will have to adjust the fee objects on line 293 
+// if you change numberofRoyaltyPayoutRecipients from 2, you will have to adjust the fee objects on line 279 
 const numberOfRoyaltyPayoutRecipients = 2; // specify number of recipients who will be splitting royalty
+const royaltyRecipient1 = "0x45bb50734c961b1629b5bb70a4a7a3b3d3c4852a";
+const royaltyRecipient2 = "0x806164c929ad3a6f4bd70c2370b3ef36c64deaa8";
 
 
+// === App ===
 
 function OldEnglish({
   readContracts,
@@ -277,11 +280,11 @@ function OldEnglish({
                     // insert/remove number of fee objects to match the value you set for numberOfRoyaltyPayoutRecipients on line 243
                     {
                       amount: ethers.utils.parseUnits(artistRoyaltyShare, 'ether').toString(), 
-                      recipient: '0x45bb50734c961b1629b5bb70a4a7a3b3d3c4852a', // fee recipient 1
+                      recipient: royaltyRecipient1, // fee recipient 1
                     },
                     {
                       amount: ethers.utils.parseUnits(artistRoyaltyShare, 'ether').toString(),
-                      recipient: '0x806164c929ad3a6f4bd70c2370b3ef36c64deaa8', // fee recipient 2 
+                      recipient: royaltyRecipient2, // fee recipient 2 
                     },
                   ],
                 }                

@@ -79,6 +79,7 @@ suitable environment for testing
 ### OldEnglish.jsx Updates (packages/react-app/src/views/OldEnglish.jsx)
 
 - Line 13: Change the subgraph APIURL from optimism link: 'https://api.thegraph.com/subgraphs/name/0xtranqui/zeroex-nft-swap-v4-optimism-v4' to ropsten link: 'https://api.thegraph.com/subgraphs/name/0xtranqui/zeroex-nft-swap-v4-ropsten-v2'
+- Line 19 - 24: Artist royalty is hardcoded as 15% of each sale and that royalty payment is hardcoded to be split into two addresses. You can adjust the royalty payout by adjusting the "artistRoyalty" in line 19. You can adjust the royalty payout addresses by changing the addresses in lines 23-24. If you change line 22 "numberOfRoyaltyPayoutRecipients", make sure to follow the instructions in the comments on that line about adjusting the fee structs that are passed into the Create Order flow
 
 When you press save (on both files) to run this code, you will get a pop up on the site that alerts you that you are on the wrong network and you
 need to switch to ropsten to continue using the app. Follow those instructions :)
