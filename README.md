@@ -112,7 +112,7 @@ To begin, here is a (lengthy) step-by-step guide to creating and storing your ow
 - Click the arrow arrow next to the 2 x 2 box that sits underneath the nav burger we clicked previously
 - Click on the metadata folder to expand it
 - For each token.json file, fill in the name, description, and upload an image file (from your computer). If you don't have any art to use,
-use the free-to-use CC0 art from the Lost & Found, Vol. 1 collection! Here's a [link](https://bafybeicrpa5jwpqy5u5fvtpng3lje3ycvfz2knrkd3o4jwv3ea5pc6gfvq.ipfs.dweb.link/) to the ipfs folder holding the .png files (even better, download this art, remix it, and then tag [me](https://twitter.com/0xTranqui) and the [artist](https://twitter.com/dannydiamondss) in your final product when you finish!!!) 
+use the free-to-use CC0 art from the Lost & Found, Vol. 1 collection! Here's a [link](https://bafybeihcuklo4pmohys7j7xu5uvfpeqgg63wbdkjrx5xrma7mbyy6oxojm.ipfs.dweb.link/) to the ipfs folder holding the .png files (even better, download this art, remix it, and then tag [me](https://twitter.com/0xTranqui) and the [artist](https://twitter.com/dannydiamondss) in your final product when you finish!!!) 
   - For example file sizes, the Lost & Found, Vol. 1 collection used .png files between 3-5 MB, all with 1:1 aspect ratios
   - The "Animation URL" and "External URL" allow you to upload multimedia files / links to static HTML websites, howver you still need to provide\
     an image file to act as a thumbnail if you are planning to link to an animation/external URL
