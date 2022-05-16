@@ -16,6 +16,7 @@ const APIURL = 'https://api.thegraph.com/subgraphs/name/0xtranqui/zeroex-nft-swa
 
 
 // ========== CREATE ORDER ARTIST ROYALTY CONSTANTS ==========
+
 const artistRoyalty = 0.150000000000000000; // this value will get passed into the create order flow
 // specify total royalty % going to artists on each sale (use 18 decimals ending in trailing zeroes to avoid underflow caused by rounding)
 // if you change numberofRoyaltyPayoutRecipients from 2, you will have to adjust the fee objects on line 279 
@@ -330,6 +331,7 @@ function OldEnglish({
   }
 
    //========== 0x Protocol Cancel Order Flow ==========  
+
   const [cancelOrderForm] = Form.useForm();
   const cancelOrder = id => {
     const [cancel, setCancel] = useState(false);
